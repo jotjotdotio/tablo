@@ -34,9 +34,10 @@ about the type of data in each cell. If a value surrounded by quotes, it is
 number. If a value is a '#' followed by an ISO-8601 formatted date, it is 
 *always* a datetime.
 
-## Implementations
+## Specification and Implementations
 
-This repository contains both the __Tablo__ specification, reference
+This repository contains [the __Tablo__ specification](spec), reference
 implementations in select languages, and a set of example files.
 
 [taoup]: http://www.catb.org/esr/writings/taoup/html/ch05s02.html#id2901882
+[spec]: specification.md
