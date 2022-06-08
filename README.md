@@ -14,7 +14,7 @@ like Python or JavaScript.
 > the Microsoft version of CSV is a textbook example of how *not* to design a
 > textual file format
 
--- [Eric S. Raymond, *The Art of Unix Programming*][taop]
+—Eric S. Raymond, [*The Art of Unix Programming*][taoup]
 
 Stated simply, there is no single CSV standard. It exists as a myriad of
 informal variants whose implementation varies from vendor to vendor. Character
@@ -26,16 +26,17 @@ __Tablo__ is designed to solve a number of ambiguities and shortcomings in CSV.
 
 One of the first obvious differences is that header rows are optional, but
 well-defined. In other words, a document may or may not contain a header, but
-header data or its absence is always unambiguous.
+determining whether the document includes a header is always unambiguous.
 
 A crucial aspect of the __Tablo__ format is that it doesn't make assumptions
-about the type of data in each cell. If a value is in quotes, it is *always* a
-string. If a value is a number without quotes, it is *always* a number. If a
-value is an ISO-8601 formatted date prefixed with `#`, it is *always* a datetime.
+about the type of data in each cell. If a value surrounded by quotes, it is 
+*always* a string. If a value is a number without quotes, it is *always* a
+number. If a value is a '#' followed by an ISO-8601 formatted date, it is 
+*always* a datetime.
 
 ## Implementations
 
-This repository contains both the __Tablo__ specification, a reference
-implementation, and a set of example files.
+This repository contains both the __Tablo__ specification, reference
+implementations in select languages, and a set of example files.
 
-[taop]: http://www.catb.org/esr/writings/taoup/html/ch05s02.html#id2901882
+[taoup]: http://www.catb.org/esr/writings/taoup/html/ch05s02.html#id2901882
