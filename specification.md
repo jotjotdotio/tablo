@@ -18,7 +18,7 @@ __Tablo__ is a plain text interchange format for tabular data.
 
 ## Format Overview
 
-A __Tablo__ file consists of three sections: an optional header, the table data, and an optional format section. The header is a single line that specifies column labels. Table data consists of individual lines of comma-separated values, with each line consisting of a single table entry. The format section is a collection of declarations to apply text formatting rules to selected cells or groups of cells.
+A __Tablo__ file consists of three sections: an optional header, the table data, and an optional format section. The header is a single line that specifies column labels. Table data consists of individual lines of comma-separated values, with each line representing a single table row. The format section is a collection of declarations to apply text formatting rules to selected cells or groups of cells.
 
 ## Types
 
@@ -44,26 +44,28 @@ Additionally, arbitrary Unicode code points can be written in the format `\u{n}`
 | String Examples                            |
 |--------------------------------------------|
 | `"155 Water Street"`                       |
-| `"11201"`                                  |
+| `"10025"`                                  |
 | `"some \"quoted\" text"`                   |
 | `"backslash, \\, or reverse solidus"`      |
 | `"é can be written as \u{E9} or e\u{301}"` |
 
 ### Numbers
 
-A number is a decimal representation of a positive or negative whole number or arbitrary precision floating-point number. Floating-point values may be written in decimal or scientific notation. Numbers represented in __Tablo__ are abstract, and no hardware representation is implied. Implementations should use their best judgement in chosing the best memory representation for a particular numeric value.
+A number is either an integer whole number or arbitrary precision floating point value. Integers may be written either in decimal or hexadecimal notation, and floating point values may be written in either decimal or scientific notation.
+
+Numbers represented in __Tablo__ are abstract, and no hardware representation is implied. Implementations should use their best judgement in chosing the appropriate memory representation for a particular numeric value.
 
 | Decimal integer | Hexadecimal | Decimal floating point | Scientific |
 |-----------------|-------------|------------------------|------------|
 | 0               | 0x0         | 0.                     | 0e0        |
 | 42              | 0xF5        | .01                    | 5e2        |
-| 1_000_000       | -0xC8       | 1_234.56               | 31e+2      |
-| +102            | +0xcafe     | -4.302                 | 3.2e-4     |
-| -21_345         | 0xdead_beef | 3.141_59               | -4_345.1e3 |
+| 1_000_000       | -0xa8       | 1_234.56               | 31e+2      |
+| +102            | +0xC1A0     | -4.302                 | 3.2e-4     |
+| -21_345         | 0x1ced_cafe | 3.141_59               | -4_345.1e3 |
 
 ### Dates and Times
 
-Dates and times are represented as modified RFC 3339 date string. Because of the ambiguity between a calendar year in RFC 3339 and an integer in the __Tabla__ format, a date must always be prefixed by a literal hash mark (`#`).
+Dates and times are represented as modified RFC 3339 date string. Because of the ambiguity between standalone calendar years or hours in RFC 3339 and integers in the __Tablo__ format, a date must always be prefixed by a literal hash mark (`#`).
 
 | Description                                        | Format                      | Example                  |
 |----------------------------------------------------|-----------------------------|--------------------------|
@@ -93,17 +95,23 @@ The __*header*__ is an optional single line consisting of a comma-separated list
 =
 ```
 
+- The header line, if present, *must* start on the first line of the document.
+- The header separator, `=`, *must* be the first character on the line immediately following the header values. It *must* be immediately followed by a new line character.
+- If there are no header labels in the document, the header separator *must* be the first character of the first line of the document. It *must* be immediately followed by a new line character.
+
 ## Table Data
 
-The __*table data*__ section consists of lines of comma-separated values, one line per row of data.
+The __*table data*__ section consists of lines of comma-separated values, where each line represents one row of data.
+
+The number of elements in each row must be the same throughout the document. To represent an empty cell within a row, use a null value (`-`).
 
 ```
-"Gold Marilyn Monroe", "Silkscreen ink and acrylic on canvas", 1962T, 211.4, 144.7
-"Double Elvis", "Silkscreen ink on acrylic on canvas", 1963T, 210.8, 134.6
-"Flowers", "Offset lithograph", 1964T, 55.8, 55.7
-"Cow", "Screenprint", 1966T, 116.7, 74.5
-"Self-Portrait", "Screenprint", 1966T, 56, 52.8
-"Mao", "Silkscreen ink and acrylic on linen", 1973T, 66.5, 55.9
+"Gold Marilyn Monroe", "Silkscreen ink and acrylic on canvas", #1962, 211.4, 144.7
+"Double Elvis", "Silkscreen ink on acrylic on canvas", #1963, 210.8, 134.6
+"Flowers", "Offset lithograph", #1964, 55.8, 55.7
+"Cow", "Screenprint", #1966, 116.7, 74.5
+"Self-Portrait", "Screenprint", #1966, 56, 52.8
+"Mao", "Silkscreen ink and acrylic on linen", #1973, 66.5, 55.9
 ```
 
 A line consisting of a single tilde character (`~`) indicates a "table break", which creates a visual break between groups of rows with headers repeated above each group. Row numbering continues sequentially across table breaks.
