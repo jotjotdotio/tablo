@@ -37,7 +37,8 @@ number. If a value is a '#' followed by an ISO-8601 formatted date, it is
 ## Specification and Implementations
 
 This repository contains [the __Tablo__ specification][spec], reference
-implementations in select languages, and a set of example files.
+implementations in select languages, and a set of [example files][examples].
 
 [taoup]: http://www.catb.org/esr/writings/taoup/html/ch05s02.html#id2901882
 [spec]: specification.md
+[examples]: examples
