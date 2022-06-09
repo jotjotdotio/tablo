@@ -1,0 +1,11 @@
+"Title", "Medium", "Year", "Width", "Height"
+=
+"Gold Marilyn Monroe", "Silkscreen ink and acrylic on canvas", #1962, 211.4, 144.7
+"Double Elvis", "Silkscreen ink on acrylic on canvas", #1963, 210.8, 134.6
+"Flowers", "Offset lithograph", #1964, 55.8, 55.7
+"Cow", "Screenprint", #1966, 116.7, 74.5
+"Self-Portrait", "Screenprint", #1966, 56, 52.8
+"Mao", "Silkscreen ink and acrylic on linen", #1973, 66.5, 55.9
+*
+[A] {bold}
+[A3:E3] {italic, red}
