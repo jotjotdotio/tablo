@@ -86,7 +86,12 @@ A boolean is a value of either `true` or `false`.
 
 A null, or empty cell, is represented by a hyphen.
 
-## Header
+## Document Structure
+
+Because some editors and version control systems strip trailing newlines when saving, the 
+final format specifier line does not need to end with a new line character.
+
+### Header
 
 The __*header*__ is an optional single line consisting of a comma-separated list of strings to be used as column labels. A column with no label is represented by a null value. The header is followed by a line containing a single equal sign.
 
@@ -99,7 +104,7 @@ The __*header*__ is an optional single line consisting of a comma-separated list
 - The header separator, `=`, *must* be the first character on the line immediately following the header values. It *must* be immediately followed by a new line character.
 - If there are no header labels in the document, the header separator *must* be the first character of the first line of the document. It *must* be immediately followed by a new line character.
 
-## Table Data
+### Table Data
 
 The __*table data*__ section consists of lines of comma-separated values, where each line represents one row of data.
 
@@ -116,7 +121,7 @@ The number of elements in each row must be the same throughout the document. To 
 
 A line consisting of a single tilde character (`~`) indicates a "table break", which creates a visual break between groups of rows with headers repeated above each group. Row numbering continues sequentially across table breaks.
 
-## Formatting
+### Formatting
 
 The __*formatting*__ section begins with a line containing a single asterisk. It is followed by lines that specify formatting options for cell ranges. Format specifiers consist of a range selector enclosed in square brackets, followed by a list of formatting properties to be applied to the cell, enclosed in braces.
 
@@ -124,7 +129,7 @@ Format properties can adjust text style, font proportionality, and text color. T
 
 ```
 *
-[A] {bold}
+[A:A] {bold}
 [A3:E3] {italic, red}
 ```
 
