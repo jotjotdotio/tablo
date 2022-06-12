@@ -29,7 +29,7 @@ well-defined. In other words, a document may or may not contain a header, but
 determining whether the document includes a header is always unambiguous.
 
 A crucial aspect of the __Tablo__ format is that it doesn't make assumptions
-about the type of data in each cell. If a value surrounded by quotes, it is 
+about the type of data in each cell. If a value is surrounded by quotes, it is 
 *always* a string. If a value is a number without quotes, it is *always* a
 number. If a value is a '#' followed by an ISO-8601 formatted date, it is 
 *always* a datetime.
