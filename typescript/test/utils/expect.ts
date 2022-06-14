@@ -16,7 +16,7 @@ export const expectCapture = (pattern, inputs: {[key: string]: any}) => {
         const [offset, result, error] = match;
         expect(error).toBeUndefined();
         expect(offset).toBe(key.length);
-        expect(result).toBe(inputs[key]);
+        expect(result).toStrictEqual(inputs[key]);
     });
 }
 

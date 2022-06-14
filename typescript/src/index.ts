@@ -51,6 +51,122 @@ export const Token = Object.freeze({
 });
 
 
+export const _document = (input: string, offset: number): parseResult => {
+    let [position, result, error] = concat(input, offset, [_header, _data]);
+
+    if (error) {
+        return [position, undefined, error];
+    }
+
+    const [head, rows] = result;
+
+    if (position === input.length) {
+        return [position, [head, rows, new CellFormat({})], undefined];
+    }
+
+    let fmts;
+    [position, fmts, error] = _format(input, position);
+
+    if (error) {
+        return [position, undefined, error];
+    }
+
+    return [position, [head, rows, fmts], undefined];
+}
+
+export const _header = (input: string, offset: number): parseResult => {
+    // Header is an optional single line followed by a required line
+    // containing a single equal sign.
+    const headerLine = (input: string, off: number): parseResult => {
+        let [position, elt, error] = _label(input, off);
+        if (error) { return [position, [], undefined];}
+
+        let elts;
+        [position, elts, error] = repeat(input, position, [_comma, _label]);
+
+        if (error) {
+            return [position, undefined, error];
+        }
+        
+        let _ignore;
+        [position, _ignore, error] = _newline(input, position);
+    
+        if (error) {
+            return [position, undefined, 'newline at end of header'];
+        }    
+
+        const labels = elts.filter((e: any) => e !== Token.Comma);
+        labels.unshift(elt);
+        return [position, labels, undefined];
+    }
+
+    let [position, elts, error] = headerLine(input, offset);
+
+    if (error) {
+        return [position, undefined, error];
+    }
+
+    let _ignore;
+    [position, _ignore, error] = concat(input, position, [_equals, _newline]);
+
+    if (error) {
+        return [position, undefined, error];
+    } else {
+        return [position, elts, undefined];
+    }
+}
+
+export const _data = (input: string, offset: number): parseResult => {
+    // Data is a sequence of zero or more lines. Each line is a comma-
+    // separated series of elements of type string, number, boolean,
+    // or null. A tilde on a single line indicates a break between
+    // series of rows.
+    const [position, rows, error] = repeat(input, offset, [_row]);
+
+    if (error) {
+        return [position, undefined, error];
+    } else {
+        const groups = rows.reduce((result, elt) => {
+            if (elt === Token.Tilde) {
+                result.push([]);
+            } else {
+                result[result.length - 1].push(elt);
+            }
+            
+            return result;
+        }, [[]]);
+        
+        return [position, groups, undefined];
+    }
+}
+
+export const _format = (input: string, offset: number): parseResult => {
+    let [position, _ignore, errors] = concat(input, offset, [_star, _newline]);
+    
+    if (errors) {
+        return [position, undefined, errors];
+    }
+
+    return _formatRules(input, position);
+}
+
+export const _formatRules = (input: string, offset: number): parseResult => {
+    type RuleType = {[key: string]: string[]};
+    let [position, lines, error] = repeat(input, offset, [_formatRule]);
+
+    if (error) {
+        return [position, undefined, error];
+    } else if (position !== input.length) {
+        return [position, undefined, 'format rule'];
+    }
+
+    const rules = lines.reduce((result: RuleType, line: RuleType) => {
+        Object.assign(result, line);
+        return result;
+    }, {});
+
+    return [position, new CellFormat(rules), undefined];
+}
 
 export const _formatRule = (input: string, offset: number): parseResult => {
     let [position, range, error] = _cellRange(input, offset);
