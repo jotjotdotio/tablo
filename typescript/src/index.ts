@@ -1,4 +1,4 @@
-
+import { concat, altern, repeat, parseResult } from './combinators';
 
 export const parse = () => {
 
@@ -6,29 +6,29 @@ export const parse = () => {
 
 const pattern = {
     // Value types
-	string: /"((?:[^"\\]|\\.)*)"[^\S\r\n]*/y,
-	integer: /([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
-	float: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.0+))[^\S\r\n]*/y,
-	hex: /([+-]?0x(?:[\dA-Fa-f]+_?)*[\dA-Fa-f]+)[^\S\r\n]*/y,
-	exponent: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.0+|(?:\d+_?)*\d+))[eE]([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
-	date: /#(?:(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?)?/y,
+    string: /"((?:[^"\\\n]|\\.)*)"[^\S\r\n]*/y,
+    integer: /([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
+    float: /([+-]?(?:(?:(?:\d(?:_?\d+)*)?\.(?:(?:\d+_?)*\d+)?)|0+))[^\S\r\n]*/y,
+    hex: /([+-]?0x(?:[\dA-Fa-f]+_?)*[\dA-Fa-f]+)[^\S\r\n]*/y,
+    exponent: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.0+|(?:\d+_?)*\d+))[eE]([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
+    date: /#(?:(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?)?/y,
     time: /(\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d{4}))?)?)?(Z|[+-]?\d{4})?/y,
     boolean: /(true|false)[^\S\r\n]*/y,
-	null: /-[^\S\r\n]*/y,
-	
+    null: /-[^\S\r\n]*/y,
+
     // Syntactic tokens
     newline: /\n/y,
-	comma: /,[^\S\r\n]*/y,
-	equals: /=/y,
-	tilde: /~/y,
-	star: /\*/y,
-	openBrace: /{[^\S\r\n]*/y,
-	closeBrace: /}[^\S\r\n]*\n/y,
+    comma: /,[^\S\r\n]*/y,
+    equals: /=/y,
+    tilde: /~/y,
+    star: /\*/y,
+    openBrace: /{[^\S\r\n]*/y,
+    closeBrace: /}[^\S\r\n]*\n/y,
 
-	formatRngSel: /\[([A-Z]+(?::[A-Z]+)?|[\d]+(?::[\d]+)?|[A-Z]+[\d]+(?::[A-Z]+[\d]+)?)\][^\S\r\n]*/y,
+    formatRngSel: /\[([A-Z]+(?::[A-Z]+)?|[\d]+(?::[\d]+)?|[A-Z]+[\d]+(?::[A-Z]+[\d]+)?)\][^\S\r\n]*/y,
     // Matches cell specifiers in the form [A1:Z9], [B:F], [0:9], or [D4]
     cellRange: /\[(?:([A-Z]+[\d]+):([A-Z]+[\d]+)|([A-Z]+):([A-Z]+)|([\d]+):([\d]+)|([A-Z]+[\d]+))\][^\S\r\n]*/y,
-	propName: /(plain|bold|italic|underline|strike|normal|mono|black|red|orange|yellow|green|blue|violet|grey|white)[^\S\r\n]*/y,
+    propName: /(plain|bold|italic|underline|strike|normal|mono|black|red|orange|yellow|green|blue|violet|grey|white)[^\S\r\n]*/y,
 };
 
 type label = string | null;
@@ -38,140 +38,154 @@ type element = string | number | boolean | null;
 type row = element[];
 type data = row[];
 
-type format = {[key: string]: string[]};
-type parseResult = [offset: number, result: any, error: string | undefined];
-type rule = (input: string, offset: number) => parseResult;
+type format = { [key: string]: string[] };
 
-enum Token {
-    Equals,
-    Tilde,
-    Star,
-    Comma,
-    Newline,
-    OpenBrace,
-    CloseBrace
-};
+export const Token = Object.freeze({
+    Equals: Symbol('='),
+    Tilde: Symbol('~'),
+    Star: Symbol('*'),
+    Comma: Symbol(','),
+    Newline: Symbol('\n'),
+    OpenBrace: Symbol('{'),
+    CloseBrace: Symbol('}'),
+});
 
-/**
- * Parses the input string starting at the given offset, attempting to match
- * the concatenation of the list of parsing rules.
- * 
- * @param {string} input the string to be parsed
- * @param {number} offset the string index of the extent of completed parsing
- * @param {rule[]} rules a list of parsing rules
- * @returns an [offset, result, error] vector
- * 
- * If successful, the offset will be updated to the end of the matched string,
- * the result will be the concatenation of parse function results, and error
- * will be undefined. If any of the parsing rules fail to match, offset will
- * be the initial value, the result will be undefined, and error will be the
- * error message from the failing parsing rule.
- */
-const concat = (input: string, offset: number, rules: rule[]): parseResult => {
-    const seq = [];
-    for (const rule of rules) {
-        const [newOffset, result, error] = rule.call(null, input, offset);
-        if (error) {
-            return [offset, undefined, error];
-        } else {
-            offset = newOffset;
-            seq.push(result);
-        }
-    }
-    return [offset, seq, undefined];
-}
 
-/**
- * Parses the input string starting at the given offset, testing each parsing
- * rule in order and returning the first available match.
- * 
- * @param {string} input the string to be parsed
- * @param {number} offset the string index of the extent of completed parsing
- * @param {rule[]} rules a list of parsing rules
- * @returns an [offset, result, error] vector
- *
- * If successful, the offset will be updated to the end of the matched string,
- * the result will be the result of the first matching parse function, and 
- * error will be undefined. If any of the parsing rules fail to match, offset
- * will be the initial value, the result will be undefined, and error will be
- * the concatenation of error messages from the failing parsing rules.
- */
-const altern = (input: string, offset: number, rules: rule[]): parseResult => {
-    const errors = [];
-    for (const rule of rules) {
-        const [newOffset, result, error] = rule.call(null, input, offset);
+export const _document = (input: string, offset: number): parseResult => {
+    let [position, result, error] = concat(input, offset, [_header, _data]);
 
-        if (!error) {
-            return [newOffset, result, undefined];
-        } else {
-            errors.push(...error);
-        }
-    }
-    return [offset, undefined, `one of ${errors.join(',')}`];
-}
-
-/**
- * Parses the input string starting at the given offset, consuming zero or
- * more repetitions of the concatenation of the parsing rules.
- *  
- * @param {string} input the string to be parsed
- * @param {number} offset the string index of the extent of completed parsing
- * @param {rule[]} rules a list of parsing rules
- * @returns an [offset, result, error] vector
- *
- * If successful, the offset will be updated to the end of the matched string,
- * the result will be the flattened list of matched values, and error will be
- * undefined. If an error is encountered...
- * TODO: This should probably not error. Either generate a match or an empty list.
- */
-const repeat = (input: string, offset: number, rules: rule[]): parseResult => {
-    let position = offset;
-    const results = [];
-    let error = undefined;
-
-    while (true) {
-        const [first, ...rest] = rules;
-        let result;
-        [position, result, error] = first.call(null, input, position);
-        
-        if (error) {
-            // No match
-            error = undefined;
-            break;
-        } else {
-            results.push(result);
-        }
-        
-        [position, result, error] = concat(input, position, rest);
-        
-        if (error) {
-            return [offset, undefined, error];
-        } else {
-            results.push(...result);
-        }
-    }
-
-    return [position, results, error];
-}
-
-const _formatRule = (input: string, offset: number): parseResult => {
-    let [position, range, error] = _cellRange(input, offset);
-    
     if (error) {
         return [position, undefined, error];
     }
+
+    const [head, rows] = result;
+
+    if (position === input.length) {
+        return [position, [head, rows, new CellFormat({})], undefined];
+    }
+
+    let fmts;
+    [position, fmts, error] = _format(input, position);
+
+    if (error) {
+        return [position, undefined, error];
+    }
+
+    return [position, [head, rows, fmts], undefined];
+}
+
+export const _header = (input: string, offset: number): parseResult => {
+    // Header is an optional single line followed by a required line
+    // containing a single equal sign.
+    const headerLine = (input: string, off: number): parseResult => {
+        let [position, elt, error] = _label(input, off);
+        if (error) { return [position, [], undefined];}
+
+        let elts;
+        [position, elts, error] = repeat(input, position, [_comma, _label]);
+
+        if (error) {
+            return [position, undefined, error];
+        }
+        
+        let _ignore;
+        [position, _ignore, error] = _newline(input, position);
     
+        if (error) {
+            return [position, undefined, 'newline at end of header'];
+        }    
+
+        const labels = elts.filter((e: any) => e !== Token.Comma);
+        labels.unshift(elt);
+        return [position, labels, undefined];
+    }
+
+    let [position, elts, error] = headerLine(input, offset);
+
+    if (error) {
+        return [position, undefined, error];
+    }
+
+    let _ignore;
+    [position, _ignore, error] = concat(input, position, [_equals, _newline]);
+
+    if (error) {
+        return [position, undefined, error];
+    } else {
+        return [position, elts, undefined];
+    }
+}
+
+export const _data = (input: string, offset: number): parseResult => {
+    // Data is a sequence of zero or more lines. Each line is a comma-
+    // separated series of elements of type string, number, boolean,
+    // or null. A tilde on a single line indicates a break between
+    // series of rows.
+    const [position, rows, error] = repeat(input, offset, [_row]);
+
+    if (error) {
+        return [position, undefined, error];
+    } else {
+        const groups = rows.reduce((result, elt) => {
+            if (elt === Token.Tilde) {
+                result.push([]);
+            } else {
+                result[result.length - 1].push(elt);
+            }
+            
+            return result;
+        }, [[]]);
+        
+        return [position, groups, undefined];
+    }
+}
+
+export const _format = (input: string, offset: number): parseResult => {
+    let [position, _ignore, errors] = concat(input, offset, [_star, _newline]);
+    
+    if (errors) {
+        return [position, undefined, errors];
+    }
+
+    return _formatRules(input, position);
+}
+
+export const _formatRules = (input: string, offset: number): parseResult => {
+    type RuleType = {[key: string]: string[]};
+    let [position, lines, error] = repeat(input, offset, [_formatRule]);
+
+    if (error) {
+        return [position, undefined, error];
+    } else if (position !== input.length) {
+        return [position, undefined, 'format rule'];
+    }
+
+    const rules = lines.reduce((result: RuleType, line: RuleType) => {
+        Object.assign(result, line);
+        return result;
+    }, {});
+
+    return [position, new CellFormat(rules), undefined];
+}
+
+export const _formatRule = (input: string, offset: number): parseResult => {
+    let [position, range, error] = _cellRange(input, offset);
+
+    if (error) {
+        return [position, undefined, error];
+    }
+
     let props;
     [position, props, error] = _properties(input, position);
 
     if (error) {
         return [position, undefined, error];
     } else {
-        return [position, {[range]: props}, undefined];
+        return [position, { [range]: props }, undefined];
     }
 }
 
-const _cellRange = (input: string, offset: number): parseResult => {
+export const _cellRange = (input: string, offset: number): parseResult => {
     // TODO: Change to use pattern.cellRange
     pattern.formatRngSel.lastIndex = offset;
     let match = pattern.formatRngSel.exec(input);
@@ -183,7 +197,7 @@ const _cellRange = (input: string, offset: number): parseResult => {
     }
 }
 
-const _properties = (input: string, offset: number): parseResult => {
+export const _properties = (input: string, offset: number): parseResult => {
     let [position, _ignore, error] = _openBrace(input, offset);
 
     if (error) {
@@ -209,13 +223,13 @@ const _properties = (input: string, offset: number): parseResult => {
     if (error) {
         return [position, undefined, error];
     } else {
-        const filteredProps = props.filter((prop: string | Token) => prop !== Token.Comma);
+        const filteredProps = props.filter((prop) => prop !== Token.Comma);
         filteredProps.unshift(prop);
         return [position, filteredProps, undefined];
     }
 }
 
-const _row = (input: string, offset: number): parseResult => {
+export const _row = (input: string, offset: number): parseResult => {
     let [position, elt, error] = _element(input, offset);
 
     if (error) {
@@ -247,18 +261,18 @@ const _row = (input: string, offset: number): parseResult => {
     return [position, items, undefined];
 }
 
-const _element = (input: string, offset: number): parseResult => {
+export const _element = (input: string, offset: number): parseResult => {
     return altern(input, offset, [_string, _number, _boolean, _null]);
 }
 
-const _label = (input: string, offset: number): parseResult => {
+export const _label = (input: string, offset: number): parseResult => {
     return altern(input, offset, [_string, _null]);
 }
 
-const _equals = (input: string, offset: number): parseResult => {
+export const _equals = (input: string, offset: number): parseResult => {
     pattern.equals.lastIndex = offset;
     const match = pattern.equals.exec(input);
-    
+
     if (match) {
         return [pattern.equals.lastIndex, Token.Equals, undefined];
     } else {
@@ -266,7 +280,7 @@ const _equals = (input: string, offset: number): parseResult => {
     }
 }
 
-const _star = (input: string, offset: number): parseResult => {
+export const _star = (input: string, offset: number): parseResult => {
     pattern.star.lastIndex = offset;
     const match = pattern.star.exec(input);
     if (match) {
@@ -276,7 +290,7 @@ const _star = (input: string, offset: number): parseResult => {
     }
 }
 
-const _tilde = (input: string, offset: number): parseResult => {
+export const _tilde = (input: string, offset: number): parseResult => {
     pattern.tilde.lastIndex = offset;
     const match = pattern.tilde.exec(input);
     if (match) {
@@ -286,7 +300,7 @@ const _tilde = (input: string, offset: number): parseResult => {
     }
 }
 
-const _comma = (input: string, offset: number): parseResult => {
+export const _comma = (input: string, offset: number): parseResult => {
     pattern.comma.lastIndex = offset;
     const match = pattern.comma.exec(input);
     if (match) {
@@ -296,7 +310,7 @@ const _comma = (input: string, offset: number): parseResult => {
     }
 }
 
-const _newline = (input: string, offset: number): parseResult => {
+export const _newline = (input: string, offset: number): parseResult => {
     pattern.newline.lastIndex = offset;
     const match = pattern.newline.exec(input);
     if (match) {
@@ -306,10 +320,10 @@ const _newline = (input: string, offset: number): parseResult => {
     }
 }
 
-const _openBrace = (input: string, offset: number): parseResult => {
+export const _openBrace = (input: string, offset: number): parseResult => {
     pattern.openBrace.lastIndex = offset;
     const match = pattern.openBrace.exec(input);
-    
+
     if (match) {
         return [pattern.openBrace.lastIndex, Token.OpenBrace, undefined];
     } else {
@@ -317,10 +331,10 @@ const _openBrace = (input: string, offset: number): parseResult => {
     }
 }
 
-const _closeBrace = (input: string, offset: number): parseResult => {
+export const _closeBrace = (input: string, offset: number): parseResult => {
     pattern.closeBrace.lastIndex = offset;
     const match = pattern.closeBrace.exec(input);
-    
+
     if (match) {
         return [pattern.closeBrace.lastIndex, Token.CloseBrace, undefined];
     } else {
@@ -328,10 +342,10 @@ const _closeBrace = (input: string, offset: number): parseResult => {
     }
 }
 
-const _propName = (input: string, offset: number): parseResult => {
+export const _propName = (input: string, offset: number): parseResult => {
     pattern.propName.lastIndex = offset;
     const match = pattern.propName.exec(input);
-    
+
     if (match) {
         return [pattern.propName.lastIndex, match[1], undefined];
     } else {
@@ -352,12 +366,12 @@ const _propName = (input: string, offset: number): parseResult => {
  * will be the initial start position, result will be undefined, and error 
  * will be 'string'.
  */
-const _string = (input: string, offset: number): parseResult => {
+export const _string = (input: string, offset: number): parseResult => {
     const escapeSequence = /\\["nt\\]|\\u\{([0-9A-Fa-f]{1,8})\}/g;
-    
+
     pattern.string.lastIndex = offset;
     const match = pattern.string.exec(input);
-    
+
     if (match) {
         const value = match[1].replace(escapeSequence, (match: string, codePoint: string) => {
             if (codePoint !== undefined) {
@@ -389,7 +403,7 @@ const _string = (input: string, offset: number): parseResult => {
  * position, result will be undefined, and error will be "one of scientific,
  * hexadecimal, float, integer".
  */
-const _number = (input: string, offset: number): parseResult => {
+export const _number = (input: string, offset: number): parseResult => {
     return altern(input, offset, [_scientific, _hex, _float, _int]);
 }
 
@@ -406,7 +420,7 @@ const _number = (input: string, offset: number): parseResult => {
  * undefined. If an error is encountered, offset will be the initial start
  * position, result will be undefined, and error will be "scientific".
  */
-const _scientific = (input: string, offset: number): parseResult => {
+export const _scientific = (input: string, offset: number): parseResult => {
     pattern.exponent.lastIndex = offset;
     const match = pattern.exponent.exec(input);
 
@@ -436,10 +450,10 @@ const _scientific = (input: string, offset: number): parseResult => {
  * undefined. If an error is encountered, offset will be the initial start
  * position, result will be undefined, and error will be "float".
  */
-const _float = (input: string, offset: number): parseResult => {
+export const _float = (input: string, offset: number): parseResult => {
     pattern.float.lastIndex = offset;
     const match = pattern.float.exec(input);
-    
+
     if (match) {
         return [
             pattern.float.lastIndex,
@@ -463,10 +477,10 @@ const _float = (input: string, offset: number): parseResult => {
  * undefined. If an error is encountered, offset will be the initial start
  * position, result will be undefined, and error will be "integer".
  */
-const _int = (input: string, offset: number): parseResult => {
+export const _int = (input: string, offset: number): parseResult => {
     pattern.integer.lastIndex = offset;
     const match = pattern.integer.exec(input);
-    
+
     if (match) {
         return [
             pattern.integer.lastIndex,
@@ -491,10 +505,10 @@ const _int = (input: string, offset: number): parseResult => {
  * undefined. If an error is encountered, offset will be the initial start
  * position, result will be undefined, and error will be "hexadecimal".
  */
-const _hex = (input: string, offset: number): parseResult => {
+export const _hex = (input: string, offset: number): parseResult => {
     pattern.hex.lastIndex = offset;
     const match = pattern.hex.exec(input);
-    
+
     if (match) {
         return [
             pattern.hex.lastIndex,
@@ -518,12 +532,12 @@ const _hex = (input: string, offset: number): parseResult => {
  * undefined. If an error is encountered, offset will be the initial start
  * position, result will be undefined, and error will be "boolean".
  */
-const _boolean = (input: string, offset: number): parseResult => {
+export const _boolean = (input: string, offset: number): parseResult => {
     pattern.boolean.lastIndex = offset;
     const match = pattern.boolean.exec(input);
-    
+
     if (match) {
-        return [pattern.boolean.lastIndex, Boolean(match[1]), undefined];
+        return [pattern.boolean.lastIndex, match[1] == 'true', undefined];
     } else {
         return [offset, undefined, 'boolean'];
     }
@@ -541,10 +555,10 @@ const _boolean = (input: string, offset: number): parseResult => {
  * error is encountered, offset will be the initial start position, result
  * will be undefined, and error will be "null".
  */
-const _null = (input: string, offset: number): parseResult => {
+export const _null = (input: string, offset: number): parseResult => {
     pattern.null.lastIndex = offset;
     const match = pattern.null.exec(input);
-    
+
     if (match) {
         return [pattern.null.lastIndex, null, undefined];
     } else {
