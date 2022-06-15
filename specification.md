@@ -1,6 +1,6 @@
 # Tablo File Format Specification
 
-__Tablo__ is a plain text interchange format for tabular data.
+__tablo__ is a plain text interchange format for tabular data.
 
 ## Table of Contents
 
@@ -18,11 +18,11 @@ __Tablo__ is a plain text interchange format for tabular data.
 
 ## Format Overview
 
-A __Tablo__ file consists of three sections: an optional header, the table data, and an optional format section. The header is a single line that specifies column labels. Table data consists of individual lines of comma-separated values, with each line representing a single table row. The format section is a collection of declarations to apply text formatting rules to selected cells or groups of cells.
+A __tablo__ file consists of three sections: an optional header, the table data, and an optional format section. The header is a single line that specifies column labels. Table data consists of individual lines of comma-separated values, with each line representing a single table row. The format section is a collection of declarations to apply text formatting rules to selected cells or groups of cells.
 
 ## Types
 
-All values in __Tablo__ belong to one of five data types. Each type has a unique and unambiguous representation in __Tablo__. The five types are *string*, *number*, *datetime*, *boolean*, and *null*. 
+All values in __tablo__ belong to one of five data types. Each type has a unique and unambiguous representation in __tablo__. The five types are *string*, *number*, *datetime*, *boolean*, and *null*. 
 
 ### Strings
 
@@ -53,7 +53,7 @@ Additionally, arbitrary Unicode code points can be written in the format `\u{n}`
 
 A number is either an integer whole number or arbitrary precision floating point value. Integers may be written either in decimal or hexadecimal notation, and floating point values may be written in either decimal or scientific notation.
 
-Numbers represented in __Tablo__ are abstract, and no hardware representation is implied. Implementations should use their best judgement in chosing the appropriate memory representation for a particular numeric value.
+Numbers represented in __tablo__ are abstract, and no hardware representation is implied. Implementations should use their best judgement in chosing the appropriate memory representation for a particular numeric value.
 
 | Decimal integer | Hexadecimal | Decimal floating point | Scientific |
 |-----------------|-------------|------------------------|------------|
@@ -65,7 +65,7 @@ Numbers represented in __Tablo__ are abstract, and no hardware representation is
 
 ### Dates and Times
 
-Dates and times are represented as modified RFC 3339 date string. Because of the ambiguity between standalone calendar years or hours in RFC 3339 and integers in the __Tablo__ format, a date must always be prefixed by a literal hash mark (`#`).
+Dates and times are represented as modified RFC 3339 date string. Because of the ambiguity between standalone calendar years or hours in RFC 3339 and integers in the __tablo__ format, a date must always be prefixed by a literal hash mark (`#`).
 
 | Description                                        | Format                      | Example                  |
 |----------------------------------------------------|-----------------------------|--------------------------|
