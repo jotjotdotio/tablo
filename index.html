@@ -7,7 +7,7 @@
         <meta name="keywords" content="file format data interchange">
         <link rel="preconnect" href="https://fonts.googleapis.com"> 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,500;1,300;1,500&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;0,300;0,500;1,100;1,300;1,500&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
     </head>
@@ -15,9 +15,9 @@
         <div class="header">
             <img style="width: 100pt;" src="tablo.svg"/>
             <ul>
-                <li class="yellow"><a href="#about">About.</a></li>
-                <li class="orange"><a href="#specification">Specification.</a></li>
-                <li class="red"><a href="#implementations">Implementations.</a></li>
+                <li class="red"><a href="#about">About.</a></li>
+                <li class="orange"><a href="#implementations">Implementations.</a></li>
+                <li class="yellow"><a href="#specification">Specification.</a></li>
             </ul>
         </div>
         <div class="fade"></div>
@@ -31,16 +31,33 @@
                 In <strong>tablo</strong>, column headers are explicit and types are unambiguous.
                 Additionally, cells may be styled with text and number formatting hints.</p>
 
-            <p><strong>tablo</strong> is open source. You can contribute to
-                <a href="https://github.com/jotjotdotio/tablo"><strong>tablo</strong> on Github</a>,
-                or click below to star or watch the project.
-            </p>
+            <p><a href="https://github.com/jotjotdotio/tablo"><img src="/github.png" class="license"/></a>
+                <strong>tablo</strong> is open source. We welcome contributions to
+                <a href="https://github.com/jotjotdotio/tablo"><strong>tablo</strong> on Github</a>.</p>
 
-            <p>
-                <iframe src="https://ghbtns.com/github-btn.html?user=jotjotdotio&repo=tablo&type=star&count=true&size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
-                <iframe src="https://ghbtns.com/github-btn.html?user=jotjotdotio&repo=tablo&type=watch&count=true&size=large&v=2" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
-            </p>
+            <p><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img src="/cc.png" class="license"/><img src="/by.png" class="license"/><img src="/sa.png" class="license"/></a>This specification is provided under a
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution&ndash;Share Alike License</a>.</p>
+
+                <!--<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a>
+                <br />This work is licensed under a -->
         </section>
+
+        <section id="implementations">
+            <h1 class="red">Implementations.</h1>
+            <p>There are officially supported <strong>tablo</strong>
+                implementations in Python and TypeScript/JavaScript. We welcome
+                community-driven implementations in other languages as well.
+                In the interest of clarity, the <strong>tablo</strong> maintainers
+                ask that the <strong>tablo</strong> name be used only with
+                implementations that fully adhere to the specification described
+                here.</p>
+            <h2>Official Implementations</h2>
+            <ul>
+                <li><a href="https://github.com/jotjotdotio/tablo/tree/main/typescript">JavaScript / TypeScript</a></li>
+                <li><a href="https://github.com/jotjotdotio/tablo/tree/main/python">Python</a></li>
+            </ul>
+        </section>
+
         <section id="specification">
             <h1 class="orange">Specification.</h1>
             <p>A <strong>tablo</strong> file is consists of three sections: an optional header, the
@@ -106,18 +123,20 @@
 
             <h2>Number</h2>
             <p>A number is a sequence of decimal digits that can be followed by an
-            optional fraction part, an optional exponent, or both. Numbers may
-            be prefixed with a minus to indicate values less than zero, or a
-            plus, which has no effect on the value. Numbers may use underscores
-            as digit grouping separators.</p>
+                optional fraction part, an optional exponent, or both. Numbers may
+                be prefixed with a minus to indicate values less than zero, or a
+                plus, which has no effect on the value. Numbers may use underscores
+                as digit grouping separators.</p>
             <img style="width: 100%;" src="diagrams/number.svg"/>
             <p>Additionally, a number may be written in hexadecimal by prefixing
-            the digits with the characters <code>0x</code>. Hexadecimal numbers
-            may also be preceded by a plus or minus and may contain underscores.</p>
+                the digits with the characters <code>0x</code>. Hexadecimal numbers
+                may also be preceded by a plus or minus and may contain underscores.</p>
             <img style="width: 100%;" src="diagrams/hex.svg"/>
             
             <h2>Datetime</h2>
-            <p></p>
+            <p>Instants in time are written as 
+                <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO-8601</a> date, time,
+                or combined datetime strings preceded by a hash sign (<code>#</code>).</p>
             <img style="width: 100%;" src="diagrams/datetime.svg"/>
             
             <h2>Boolean</h2>
@@ -147,11 +166,6 @@
             <h2>Property</h2>
             <p>Style properties are keywords with text formatting semantics.</p>
             <img style="width: 100%;" src="diagrams/property.svg"/>
-        </section>
-        <section id="implementations">
-            <h1 class="red">Implementations.</h1>
-            <h2>Python</h2>
-            <h2><a href="https://github.com/jotjotdotio/tablo/tree/main/typescript">JavaScript / TypeScript</a></h2>
         </section>
     </body>
 </html>

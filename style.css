@@ -6,7 +6,7 @@ body {
 }
 
 strong {
-    font-weight: 500;
+    font-weight: 400;
 }
 
 p {
@@ -57,7 +57,7 @@ div.fade {
 }
 
 .header ul {
-    list-style-image: none;
+    list-style-type: none;
     display: inline;
 }
 
@@ -66,6 +66,16 @@ div.fade {
     padding-inline: 10pt;
     font-size: 20pt;
     font-weight: 100;
+}
+
+section ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+section ul li {
+    line-height: 1.5em;
+    padding-left: 0;
 }
 
 .red,
@@ -96,6 +106,12 @@ div.fade {
     text-decoration: underline;
 }
 
+img.license {
+    width: 20pt;
+    padding-right: 4pt;
+    margin-bottom: -5pt;
+}
+
 section:first-of-type {
     padding-top: 100pt;
 }
@@ -121,8 +137,9 @@ section h1 {
 
 section h2 {
     line-height: 1.5em;
-    font-weight: 300;
-    font-size: 14pt;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 13pt;
 }
 
 section h3 {
