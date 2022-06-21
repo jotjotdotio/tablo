@@ -1,0 +1,137 @@
+body {
+    margin: 0;
+    font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    overflow: fixed;
+}
+
+strong {
+    font-weight: 500;
+}
+
+p {
+    line-height: 1.4em;
+}
+
+div.header {
+    background-color: #FAFAFA;
+    -webkit-box-shadow: 10pt 10pt 40pt 0pt rgba(179, 179, 179, 1);
+    -moz-box-shadow: 10pt 10pt 40pt 0pt rgba(179, 179, 179, 1);
+    box-shadow: 10pt 10pt 40pt 0pt rgba(179, 179, 179, 1);
+    border-radius: 8pt;
+    padding: 10pt;
+    padding-top: 12pt;
+    width: 60em;
+    top: 16pt;
+    left: 16pt;
+    position: fixed;
+    z-index: 10;
+}
+
+div.fade {
+
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    height: 90pt;
+    background: linear-gradient(#FFF 30pt, rgba(255, 255, 255, 0) 60pt);
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;
+    pointer-events: none;
+
+}
+
+.header img {
+    display: inline;
+}
+
+.header ul {
+    list-style-image: none;
+    display: inline;
+}
+
+.header ul li {
+    display: inline;
+    padding-inline: 10pt;
+    font-size: 20pt;
+    font-weight: 100;
+}
+
+.red,
+.red a {
+    color: #b6483e;
+}
+
+.orange,
+.orange a {
+    color: #ce7d23;
+}
+
+.yellow,
+.yellow a {
+    color: #b18c00;
+}
+
+.violet,
+.violet a {
+    color: #402973;
+}
+
+.header ul li a {
+    text-decoration: none;
+}
+
+.header ul li a:hover {
+    text-decoration: underline;
+}
+
+section:first-of-type {
+    padding-top: 100pt;
+}
+
+section {
+    /* background-color: #FCFCFC;
+    -webkit-box-shadow: 10pt 10pt 20pt 0pt rgb(240, 240, 240, 1);
+    -moz-box-shadow: 10pt 10pt 20pt 0pt rgba(240, 240, 240, 1);
+    box-shadow: 20pt 20pt 80pt -20pt #F0F0F0;
+    border-radius: 8pt; */
+    padding: 10pt;
+    padding-top: 70pt;
+    margin-bottom: -70px;
+    margin-left: 8em;
+    width: 50em;
+    z-index: -1;
+}
+
+section h1 {
+    line-height: 1.5em;
+    font-weight: 300;
+}
+
+section h2 {
+    line-height: 1.5em;
+    font-weight: 300;
+    font-size: 14pt;
+}
+
+section h3 {
+    line-height: 1.5em;
+    font-weight: 500;
+    font-size: 12pt;
+}
+
+section a:visited {
+    color: #5C7DC1;
+}
+
+section a {
+    color: #3E5B98;
+}
+

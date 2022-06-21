@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+    <head>
+        <title>The Tablo File Format</title>
+        <meta charset="utf-8">
+        <meta name="description" content="The Tablo File Format">
+        <meta name="keywords" content="file format data interchange">
+        <link rel="preconnect" href="https://fonts.googleapis.com"> 
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,500;1,300;1,500&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="header">
+            <img style="width: 100pt;" src="tablo.svg"/>
+            <ul>
+                <li class="yellow"><a href="#about">About.</a></li>
+                <li class="orange"><a href="#specification">Specification.</a></li>
+                <li class="red"><a href="#implementations">Implementations.</a></li>
+            </ul>
+        </div>
+        <div class="fade"></div>
+        <section id="about">
+            <h1 class="violet"><strong>tablo</strong> is a plain text interchange format for tabular data.
+                It is more powerful than CSV while remaining easy for people to read and write.
+            </h2>
+            
+            <p><strong>tablo</strong> is designed to solve a number of ambiguities
+                and shortcomings that frustrate users of delimited formats like CSV or TSV.
+                In <strong>tablo</strong>, column headers are explicit and types are unambiguous.
+                Additionally, cells may be styled with text and number formatting hints.</p>
+        </section>
+        <section id="specification">
+            <h1 class="orange">Specification.</h1>
+            <p>A <strong>tablo</strong> file is consists of three sections: an optional header, the
+                table data, and an optional format section. The header is a single line that
+                specifies column labels. Table data consists of individual lines of comma-separated
+                values, with each line representing a single table row. The format section is a
+                collection of declarations to apply text formatting rules to selected cells or
+                groups of cells.</p>
+            <p>All values in <strong>tablo</strong> belong to one of five data types. 
+                Each type has a unique and unambiguous representation in tablo. 
+                The five types are <em>string</em>, <em>number</em>, <em>datetime</em>, <em>boolean</em>, and <em>null</em>.</p>
+            <h2>Document</h2>
+            <h2>Header</h2>
+            <h2>Data</h2>
+            <h2>Formatting</h2>
+            <h2>Label</h2>
+            <h2>Value</h2>
+            <h2>Strings</h2>
+            <h2>Numbers</h2>
+            <h2>Datetime</h2>
+            <h2>Boolean</h2>
+            <h2>Null</h2>
+            <h3>Declaration</h3>
+            <h2>Cell Range</h2>
+            <h2>Property List</h2>
+            <h2>Property</h2>
+
+        
+        </section>
+        <section id="implementations">
+            <h1 class="red">Implementations.</h1>
+            <h2>Python</h2>
+            <h2><a href="https://github.com/jotjotdotio/tablo/tree/main/typescript">JavaScript / TypeScript</a></h2>
+        </section>
+    </body>
+</html>
