@@ -91,10 +91,19 @@
             <p>Otherwise prohibited code points may be written using the unicode
                 escape sequence <code>\u{<span style="color:red">hex</span>}</code>,
                 where <code><span style="color:red">hex</span></code> represents
-                between 1 and 8 hexadecimal digits.
-            </p>
+                between one and eight hexadecimal digits.</p>
+            <p>Additional two-character
+                escape sequences are provided for <em>newline</em>, <em>carriage
+                return</em>, <em>form feed</em>, <em>horizontal tab</em>,
+                <em>backspace</em>, <em>quotation mark</em>, and <em>backslash</em>.
+                A backslash followed by any character other than the defined
+                escape characters is an error.</p>
             <img style="width: 100%;" src="diagrams/string.svg"/>
             
+            <h2>Hex Sequence</h2>
+            <p>A hex sequence consists of between one and eight hexadecimal digits.</p>
+            <img style="width: 100%;" src="diagrams/hex-sequence.svg"/>
+
             <h2>Number</h2>
             <p>A number is a sequence of decimal digits that can be followed by an
             optional fraction part, an optional exponent, or both. Numbers may
