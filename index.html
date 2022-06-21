@@ -8,6 +8,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com"> 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
         <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,500;1,300;1,500&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;0,300;0,500;1,100;1,300;1,500&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
@@ -29,6 +30,16 @@
                 and shortcomings that frustrate users of delimited formats like CSV or TSV.
                 In <strong>tablo</strong>, column headers are explicit and types are unambiguous.
                 Additionally, cells may be styled with text and number formatting hints.</p>
+
+            <p><strong>tablo</strong> is open source. You can contribute to
+                <a href="https://github.com/jotjotdotio/tablo"><strong>tablo</strong> on Github</a>,
+                or click below to star or watch the project.
+            </p>
+
+            <p>
+                <iframe src="https://ghbtns.com/github-btn.html?user=jotjotdotio&repo=tablo&type=star&count=true&size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
+                <iframe src="https://ghbtns.com/github-btn.html?user=jotjotdotio&repo=tablo&type=watch&count=true&size=large&v=2" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
+            </p>
         </section>
         <section id="specification">
             <h1 class="orange">Specification.</h1>
@@ -38,24 +49,91 @@
                 values, with each line representing a single table row. The format section is a
                 collection of declarations to apply text formatting rules to selected cells or
                 groups of cells.</p>
-            <p>All values in <strong>tablo</strong> belong to one of five data types. 
-                Each type has a unique and unambiguous representation in tablo. 
-                The five types are <em>string</em>, <em>number</em>, <em>datetime</em>, <em>boolean</em>, and <em>null</em>.</p>
+            
             <h2>Document</h2>
+            <img style="width: 100%;" src="diagrams/document.svg"/>
+            
             <h2>Header</h2>
+            <p>The header is a comma-separated sequence of strings to be
+                used as column labels. Header labels are optional descriptions
+                of the table data to follow. If a column header should be
+                empty, a hyphen may be used to indicate a null value.</p>
+            <p>Commas may be followed by optional whitespace, which consists
+                of zero or more spaces or horizontal or vertical tabs. The
+                final element of the header row must be followed immediately
+                by a newline character.</p>
+            <img style="width: 100%;" src="diagrams/header.svg"/>
+            
             <h2>Data</h2>
-            <h2>Formatting</h2>
-            <h2>Label</h2>
+            <p>The data section consists of one or more data rows. A data row
+                is a comma-separated sequence of values.</p>
+            <p>Rows may be separated into groups by inserting a line with a
+                single tilde (<code>~</code>) followed by a newline. Consecutive
+                lines may not contain group separators.</p>
+            <p>Commas may be followed by optional whitespace, which consists
+                of zero or more spaces or horizontal or vertical tabs. The
+                final element of a data row must be followed immediately
+                by a newline character.</p>
+            <img style="width: 100%;" src="diagrams/data.svg"/>
+            
             <h2>Value</h2>
-            <h2>Strings</h2>
-            <h2>Numbers</h2>
+            <p>Values belong to one of five data types: <em>string</em>,
+                <em>number</em>, <em>datetime</em>, <em>boolean</em>, or
+                <em>null</em>.</p>
+            <img style="width: 100%;" src="diagrams/value.svg"/>
+            
+            <h2>String</h2>
+            <p>Strings are always enclosed in quotation marks (<code>"</code>).
+                The value between the quotation marks is a sequence of zero or
+                more UTF-8 code points with the exception of a backslash,
+                quotation mark, or a control character in the ranges U+00
+                through U+1F and U+80 through U+9F.</p>
+            <p>Otherwise prohibited code points may be written using the unicode
+                escape sequence <code>\u{<span style="color:red">hex</span>}</code>,
+                where <code><span style="color:red">hex</span></code> represents
+                between 1 and 8 hexadecimal digits.
+            </p>
+            <img style="width: 100%;" src="diagrams/string.svg"/>
+            
+            <h2>Number</h2>
+            <p>A number is a sequence of decimal digits that can be followed by an
+            optional fraction part, an optional exponent, or both. Numbers may
+            be prefixed with a minus to indicate values less than zero, or a
+            plus, which has no effect on the value. Numbers may use underscores
+            as digit grouping separators.</p>
+            <img style="width: 100%;" src="diagrams/number.svg"/>
+            <p>Additionally, a number may be written in hexadecimal by prefixing
+            the digits with the characters <code>0x</code>. Hexadecimal numbers
+            may also be preceded by a plus or minus and may contain underscores.</p>
+            <img style="width: 100%;" src="diagrams/hex.svg"/>
+            
             <h2>Datetime</h2>
+            <p></p>
+            <img style="width: 100%;" src="diagrams/datetime.svg"/>
+            
             <h2>Boolean</h2>
+            <p>The two boolean values are <code>true</code> and <code>false</code>.</p>
+            <img style="width: 100%;" src="diagrams/boolean.svg"/>
+            
             <h2>Null</h2>
-            <h3>Declaration</h3>
-            <h2>Cell Range</h2>
-            <h2>Property List</h2>
-            <h2>Property</h2>
+            <p>A hyphen represents a null value, or empty cell.</p>
+            <img style="width: 100%;" src="diagrams/null.svg"/>
+            
+            <h2>Format</h2>
+            <img style="width: 100%;" src="diagrams/format.svg"/>
+            
+            <h2>Column</h2>
+            <p>Column specifiers consist of one or more capital letters A through Z.</p>
+            <img style="width: 100%;" src="diagrams/column.svg"/>
+            
+            <h2>Row</h2>
+            <p>Row specifiers consist of one or more decimal digits.</p>
+            <img style="width: 100%;" src="diagrams/row.svg"/>
+            
+            <h2>Cell</h2>
+            <p>Cell specifiers are column-row pairs, where the column specifier is
+                followed immediately by a row specifier.</p>
+            <img style="width: 100%;" src="diagrams/cell.svg"/>
 
         
         </section>

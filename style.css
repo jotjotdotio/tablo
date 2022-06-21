@@ -13,6 +13,10 @@ p {
     line-height: 1.4em;
 }
 
+code {
+    font-family: 'Roboto Mono', monospace;
+}
+
 div.header {
     background-color: #FAFAFA;
     -webkit-box-shadow: 10pt 10pt 40pt 0pt rgba(179, 179, 179, 1);
