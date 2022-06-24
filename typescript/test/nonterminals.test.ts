@@ -28,10 +28,16 @@ describe('Headers', () => {
 
         });
     });
+
+    it('rejects malformed headers', () => {
+        expectNoMatch(Parser._header, [
+            '= \n', ' =\n', '\n=\n', '1\n=\n',
+        ]);
+    });
 });
 
 
-describe('Row Data', () => {
+describe('Single Rows', () => {
     it('matches row separators', () => {
         expectCapture(Parser._row, {
             '~\n': Parser.Token.Tilde,
@@ -78,41 +84,39 @@ describe('Row Data', () => {
         });
     });
 
-})
-
-
-describe('Rejects malformed headers', () => {
-    it('rejects malformed headers', () => {
-        expectNoMatch(Parser._header, [
-            '= \n', ' =\n', '\n=\n', '1\n=\n',
-        ]);
+    it('matches heterogeneous elements', () => {
+        expectCapture(Parser._row, {
+            '1, "2", -, true\n': [1, '2', null, true],
+            '-, 0xCAFE, "don\'t panic", false\n': [null, 51966, "don't panic", false],
+        });
     });
 });
-// describe('Data Rows', () => {
-//     it('matches newlines', () => {
-//         expectCapture(Parser._newline, {
-//             '\n': Parser.Token.Newline,
-//         });
-//     });
 
-//     it('matches open brace', () => {
-//         expectCapture(Parser._openBrace, {
-//             '{': Parser.Token.OpenBrace,
-//             '{\t': Parser.Token.OpenBrace,
-//             '{    ': Parser.Token.OpenBrace,
-//         });
-//     });
 
-//     it('matches close brace', () => {
-//         // Note: the scanner pattern for close brace
-//         // expects a newline to immediately follow.
-//         expectCapture(Parser._closeBrace, {
-//             '}\n': Parser.Token.CloseBrace,
-//             '}\t\n': Parser.Token.CloseBrace,
-//             '}    \n': Parser.Token.CloseBrace,
-//         });
-//     });
-// });
+describe('Row Data', () => {
+
+    it('matches a single row', () => {
+        expectCapture(Parser._data, {
+            '~\n': [[], []],
+            '-\n~\n-\n': [[[null]], [[null]]],
+        });
+    });
+    
+    it('matches multiple rows', () => {
+        expectCapture(Parser._data, {
+            '1\n2\n3\n4\n': [[[1], [2], [3], [4]]],
+            '1, 2, 3\n4, 5, 6\n7, 8, 9\n': [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+            '1, 2, 3\n-, -, -\n1, 2, 3\n': [[[1, 2, 3], [null, null, null], [1, 2, 3]]],
+        });
+    });
+
+    it('matches group separators', () => {
+        expectCapture(Parser._data, {
+            '"a", "b"\n1, 2\n~\n"c", "d"\n3, 4\n': [[['a', 'b'], [1, 2]], [['c', 'd'], [3, 4]]],
+
+        });
+    });
+});
 
 
 // describe('Format Rules', () => {
