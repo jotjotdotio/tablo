@@ -42,7 +42,6 @@ describe('Values (happy cases)', () => {
         expectCapture(Parser.float, {
             '0.0': 0.0,
             '0.': 0.0,
-            '000.': 0.0,
             '.0': 0.0,
             '.000': 0.0,
             '.01': 0.01,
@@ -154,46 +153,40 @@ describe('Tokens', () => {
 
 describe('Ranges', () => {
     it('matches single cells', () => {
-        expectCapture(Parser._cellRange, {
-            '[A0]': 'A0',
-            '[ZZZ999]': 'ZZZ999',
-        });
-    });
-
-    it('matches single columns', () => {
-        expectCapture(Parser._cellRange, {
-            '[A]': 'A',
-            '[ZZZ]': 'ZZZ',
-        });
-    });
-
-    it('matches single rows', () => {
-        expectCapture(Parser._cellRange, {
-            '[0]': '0',
-            '[999]': '999',
+        expectCapture(Parser.cellRange, {
+            'A0': 'A0',
+            'ZZZ999': 'ZZZ999',
         });
     });
 
     it('matches column ranges', () => {
-        expectCapture(Parser._cellRange, {
-            '[A:A]': 'A:A',
-            '[A:ZZZ]': 'A:ZZZ',
-            '[QRS:TUV]': 'QRS:TUV',
+        expectCapture(Parser.cellRange, {
+            'A:A': 'A:A',
+            'A:ZZZ': 'A:ZZZ',
+            'QRS:TUV': 'QRS:TUV',
         });
     });
 
     it('matches row ranges', () => {
-        expectCapture(Parser._cellRange, {
-            '[0:0]': '0:0',
-            '[1:42]': '1:42'
+        expectCapture(Parser.cellRange, {
+            '0:0': '0:0',
+            '1:42': '1:42'
         });
     });
 
     it('matches rectangular selections', () => {
-        expectCapture(Parser._cellRange, {
-            '[A0:Z9]': 'A0:Z9',
-            '[B2:D20]': 'B2:D20'
+        expectCapture(Parser.cellRange, {
+            'A0:Z9': 'A0:Z9',
+            'B2:D20': 'B2:D20'
         });
+    });
+
+    it('rejects single columns', () => {
+        expectNoMatch(Parser.cellRange, ['A', 'ZZZ']);
+    });
+
+    it('rejects single rows', () => {
+        expectNoMatch(Parser.cellRange, ['0', '1', '234']);
     });
 });
 
@@ -267,7 +260,7 @@ describe('Values (rejections)', () => {
 
 describe('Ranges (rejections)', () => {
     it('rejects malformed range entries', () => {
-        expectNoMatch(Parser._cellRange, [
+        expectNoMatch(Parser.cellRange, [
             '[0A]', '[@]', '[]', '[:]', '[A 1]', '[A,B]', '[0:B]', '[B:0]',
             '[A1:0]', '[A1:Z]', '[A1:0A]', '[1A:A0]', '[1A:0A]', '[0:A1]',
             '[Z:A1]', '[D:20:A]'

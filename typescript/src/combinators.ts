@@ -31,19 +31,25 @@ export type ParseResult = [offset: number, result: any, error: string | undefine
  * @returns a new ParseRule
  */
  export const concat = (...rules: ParseRule[]) => {
-    return (input: string, index: number): ParseResult => {
+    return (input: string, offset: number): ParseResult => {
+        let cursor = offset;
         const results = [];
 
         for (const rule of rules) {
-            const [indexNew, match, error] = rule.call(null, input, index);
+            const [newOffset, match, error] = rule.call(null, input, cursor);
 
             if (error) {
-                return [index, undefined, error];
+                return [offset, undefined, error];
             } else {
-                index = indexNew;
-                results.push(match);
+                cursor = newOffset;
+                if (Array.isArray(match)) {
+                    results.push(...match);
+                } else {
+                    results.push(match);
+                }
             }
         }
+        return [cursor, results, undefined];
     }
 }
 
@@ -59,13 +65,15 @@ export type ParseResult = [offset: number, result: any, error: string | undefine
  */
 export const altern = (...rules: ParseRule[]) => {
     return (input: string, offset: number): ParseResult => {
+        let cursor = offset;
         const errors = [];
         for (const rule of rules) {
-            const [newOffset, result, error] = rule.call(null, input, offset);
+            const [newOffset, result, error] = rule.call(null, input, cursor);
 
             if (!error) {
                 return [newOffset, result, undefined];
             } else {
+                cursor = newOffset;
                 errors.push(...error);
             }
         }
@@ -88,14 +96,14 @@ export const altern = (...rules: ParseRule[]) => {
  */
 export const repeat = (...rules: ParseRule[]) => {
     return (input: string, offset: number): ParseResult => {
-        let position = offset;
+        let cursor = offset;
         const results = [];
         let error = undefined;
 
         while (true) {
             const [first, ...rest] = rules;
             let result;
-            [position, result, error] = first.call(null, input, position);
+            [cursor, result, error] = first.call(null, input, cursor);
 
             if (error) {
                 // No match
@@ -105,7 +113,7 @@ export const repeat = (...rules: ParseRule[]) => {
                 results.push(result);
             }
 
-            [position, result, error] = concat(...rest)(input, position);
+            [cursor, result, error] = concat(...rest)(input, cursor);
 
             if (error) {
                 return [offset, undefined, error];
@@ -114,6 +122,6 @@ export const repeat = (...rules: ParseRule[]) => {
             }
         }
 
-        return [position, results, error];
+        return [cursor, results, error];
     }
 }

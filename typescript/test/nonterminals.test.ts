@@ -31,7 +31,8 @@ describe('Headers', () => {
 
     it('rejects malformed headers', () => {
         expectNoMatch(Parser.header, [
-            '= 0.1 \n', ' =0.1\n', '\n=0.1\n', '1\n=\n',
+            '= 0.1 \n', ' =0.1\n', '\n=0.1\n', '1\n=0.1\n',
+            '=\n', '= \n', '\n=\n', '\n= \n'
         ]);
     });
 });
@@ -119,47 +120,41 @@ describe('Row Data', () => {
 });
 
 
-// describe('Format Rules', () => {
-//     it('matches single cells', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[A0]': 'A0',
-//             '[ZZZ999]': 'ZZZ999',
-//         });
-//     });
+describe('Format Rules', () => {
+    it('matches single cells', () => {
+        expectCapture(Parser.cellRange, {
+            'A0': 'A0',
+            'ZZZ999': 'ZZZ999',
+        });
+    });
 
-//     it('matches single columns', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[A]': 'A',
-//             '[ZZZ]': 'ZZZ',
-//         });
-//     });
+    it('matches column ranges', () => {
+        expectCapture(Parser.cellRange, {
+            'A:A': 'A:A',
+            'A:ZZZ': 'A:ZZZ',
+            'QRS:TUV': 'QRS:TUV',
+        });
+    });
 
-//     it('matches single rows', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[0]': '0',
-//             '[999]': '999',
-//         });
-//     });
+    it('matches row ranges', () => {
+        expectCapture(Parser.cellRange, {
+            '0:0': '0:0',
+            '1:42': '1:42'
+        });
+    });
 
-//     it('matches column ranges', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[A:A]': 'A:A',
-//             '[A:ZZZ]': 'A:ZZZ',
-//             '[QRS:TUV]': 'QRS:TUV',
-//         });
-//     });
+    it('matches rectangular selections', () => {
+        expectCapture(Parser.cellRange, {
+            'A0:Z9': 'A0:Z9',
+            'B2:D20': 'B2:D20'
+        });
+    });
 
-//     it('matches row ranges', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[0:0]': '0:0',
-//             '[1:42]': '1:42'
-//         });
-//     });
+    it('rejects single columns', () => {
+        expectNoMatch(Parser.cellRange, ['A', 'ZZZ']);
+    });
 
-//     it('matches rectangular selections', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[A0:Z9]': 'A0:Z9',
-//             '[B2:D20]': 'B2:D20'
-//         });
-//     });
-// });
+    it('rejects single rows', () => {
+        expectNoMatch(Parser.cellRange, ['0', '999']);
+    });
+});

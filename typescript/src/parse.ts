@@ -2,9 +2,9 @@ import {concat, altern, repeat, ParseResult} from './combinators';
 
 const pattern = {
     // Value types
-    string: /"((?:[^"\\]|\\.)*)"[^\S\r\n]*/y,
+    string: /"((?:[^"\n\\]|\\.)*)"[^\S\r\n]*/y,
     integer: /([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
-    float: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.0+))[^\S\r\n]*/y,
+    float: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.\d+))[^\S\r\n]*/y,
     hex: /([+-]?0x(?:[\dA-Fa-f]+_?)*[\dA-Fa-f]+)[^\S\r\n]*/y,
     exponent: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.0+|(?:\d+_?)*\d+))[eE]([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
     date: /#(?:(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?)?/y,
@@ -22,10 +22,9 @@ const pattern = {
     closeBrace: /}[^\S\r\n]*\n/y,
 
     version: / ?(\d+\.\d+)/y,
-    formatRngSel: /\[([A-Z]+(?::[A-Z]+)?|[\d]+(?::[\d]+)?|[A-Z]+[\d]+(?::[A-Z]+[\d]+)?)\][^\S\r\n]*/y,
     // Matches cell specifiers in the form A1:Z9, B:F, 0:9, or D4
-    cellRange: /(?:([A-Z]+[\d]+):([A-Z]+[\d]+)|([A-Z]+):([A-Z]+)|([\d]+):([\d]+)|([A-Z]+[\d]+))[^\S\r\n]*/y,
-    tag: /([A-Za-z][A-Za-z0-9_-]*)[^\S\r\n]*/y,
+    cellRange: /((?:[A-Z]+[\d]+:[A-Z]+[\d]+)|(?:[A-Z]+:[A-Z]+)|(?:[\d]+:[\d]+)|(?:[A-Z]+[\d]+))[^\S\r\n]*/y,
+    tag: /([A-Za-z_][A-Za-z0-9_-]*)[^\S\r\n]*/y,
     propName: /(plain|bold|italic|underline|strike|normal|mono|black|red|orange|yellow|green|blue|violet|grey|white)[^\S\r\n]*/y,
 };
 
@@ -100,7 +99,7 @@ export const Token = Object.freeze({
 
         if (error) { return [position, undefined, error]; }
 
-        const labels = matched[0].filter((elt) => elt !== Token.Comma);
+        const labels = matched.filter((elt) => elt !== Token.Comma && elt !== Token.Newline);
         labels.unshift(elt);
         return [position, labels, undefined];
     }
@@ -115,7 +114,7 @@ export const Token = Object.freeze({
     [position, versionNum, error] = concat(equals, version, newline)(input, position);
 
     if (error) {
-        return [position, undefined, error];
+        return [offset, undefined, error];
     } else if (versionNum[1] !== '0.1') {
         return [offset, undefined, 'invalid version number'];
     } else {
@@ -184,7 +183,7 @@ export const _formatRules = (input: string, offset: number): ParseResult => {
 }
 
 export const _formatRule = (input: string, offset: number): ParseResult => {
-    let [position, result, error] = concat(_cellRange, _properties)(input, offset);
+    let [position, result, error] = concat(cellRange, _properties)(input, offset);
 
     if (error) {
         return [position, undefined, error];
@@ -194,15 +193,15 @@ export const _formatRule = (input: string, offset: number): ParseResult => {
     }
 }
 
-export const _cellRange = (input: string, offset: number): ParseResult => {
+export const cellRange = (input: string, offset: number): ParseResult => {
     // TODO: Change to use pattern.cellRange
-    pattern.formatRngSel.lastIndex = offset;
-    let match = pattern.formatRngSel.exec(input);
+    pattern.cellRange.lastIndex = offset;
+    let match = pattern.cellRange.exec(input);
 
     if (match) {
-        return [pattern.formatRngSel.lastIndex, match[1], undefined];
+        return [pattern.cellRange.lastIndex, match[1], undefined];
     } else {
-        return [offset, undefined, 'Range Selector'];
+        return [offset, undefined, 'cell range'];
     }
 }
 
@@ -234,7 +233,7 @@ export const _properties = (input: string, offset: number): ParseResult => {
  */
  export const row = (input: string, offset: number): ParseResult => {
     let [position, rowData, error] = altern(
-        concat(element, repeat(comma, element)),
+        concat(element, repeat(comma, element), newline),
         concat(tilde, newline)
     )(input, offset);
 
@@ -243,7 +242,7 @@ export const _properties = (input: string, offset: number): ParseResult => {
     } else if (rowData![0] === Token.Tilde) {
         return [position, Token.Tilde, undefined];
     } else {
-        return [position, rowData.filter((elt: any) => elt !== Token.Comma), undefined];
+        return [position, rowData.filter((elt: any) => elt !== Token.Comma && elt !== Token.Newline), undefined];
     }
 };
 
@@ -349,6 +348,7 @@ export const comma = (input: string, offset: number): ParseResult => {
  export const newline = (input: string, offset: number): ParseResult => {
     pattern.newline.lastIndex = offset;
     const match = pattern.newline.exec(input);
+    
     if (match) {
         return [pattern.newline.lastIndex, Token.Newline, undefined];
     } else {
@@ -614,7 +614,7 @@ export const booleanValue = (input: string, offset: number): ParseResult => {
     const match = pattern.boolean.exec(input);
 
     if (match) {
-        return [pattern.boolean.lastIndex, Boolean(match[1]), undefined];
+        return [pattern.boolean.lastIndex, match[1] === 'true', undefined];
     } else {
         return [offset, undefined, 'boolean'];
     }
