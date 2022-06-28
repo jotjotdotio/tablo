@@ -163,9 +163,22 @@
                 followed immediately by a row specifier.</p>
             <img style="width: 100%;" src="diagrams/cell.svg"/>
 
-            <h2>Property</h2>
-            <p>Style properties are keywords with text formatting semantics.</p>
-            <img style="width: 100%;" src="diagrams/property.svg"/>
+            <h2>Tag</h2>
+            <p>Tags are user-assignable labels that can be associated with a format
+                selector. A tag consists of a key followed by an optional
+                whitespace-separated value. Tags have no bearing on the content of
+                a file's data, but provide style and formatting hints to application
+                renderers.</p>
+            <img style="width: 100%;" src="diagrams/tag.svg"/>
+
+            <h2>Key</h2>
+            <p>Keys are unique identifiers within a format specifier.
+                Valid characters in keys are upper and lower case latin letters A&ndash;Z,
+                the digits 0&ndash;9, underscore (<code>_</code>) and hyphen (<code>-</code>).
+                Keys must start with a letter or underscore, but the initial character may
+                be followed by any number of valid characters.
+            </p>
+            <img style="width: 100%;" src="diagrams/key.svg"/>
         </section>
     </body>
 </html>
