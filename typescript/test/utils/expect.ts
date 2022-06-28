@@ -1,3 +1,4 @@
+import { ParseRule } from "../../src/combinators";
 
 export const expectMatch = (pattern: RegExp, inputs: string[]) => {
     inputs.forEach(input => {
@@ -8,9 +9,9 @@ export const expectMatch = (pattern: RegExp, inputs: string[]) => {
     });
 }
 
-export const expectCapture = (pattern, inputs: {[key: string]: any}) => {
+export const expectCapture = (rule: ParseRule, inputs: {[key: string]: any}) => {
     Object.keys(inputs).forEach(key => {
-        const match = pattern(key, 0);
+        const match = rule(key, 0);
         expect(match).not.toBeNull();
 
         const [offset, result, error] = match;
@@ -20,9 +21,9 @@ export const expectCapture = (pattern, inputs: {[key: string]: any}) => {
     });
 }
 
-export const expectNoMatch = (pattern, inputs: string[]) => {
+export const expectNoMatch = (rule: ParseRule, inputs: string[]) => {
     inputs.forEach(input => {
-        const match = pattern(input, 0);
+        const match = rule(input, 0);
         expect(match).not.toBeNull();
 
         const [offset, result, error] = match;

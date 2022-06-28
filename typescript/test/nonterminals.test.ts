@@ -1,45 +1,52 @@
 import { expectCapture, expectNoMatch } from './utils/expect';
-import * as Parser from '../src/index';
+import * as Parser from '../src/parse';
 
 
 describe('Headers', () => {
     it('matches the empty header', () => {
-        expectCapture(Parser._header, {
-            '=\n': [],
+        expectCapture(Parser.header, {
+            '= 0.1\n': [],
         });
     });
 
     it('matches single element headers', () => {
-        expectCapture(Parser._header, {
-            '-\n=\n': [null],
-            '""\n=\n': [''],
-            '"A"\n=\n': ['A'],
-            '"Abc"\n=\n': ['Abc'],
-            '"\\n"\n=\n': ['\n'],
+        expectCapture(Parser.header, {
+            '-\n= 0.1\n': [null],
+            '""\n= 0.1\n': [''],
+            '"A"\n=0.1\n': ['A'],
+            '"Abc"\n=0.1\n': ['Abc'],
+            '"\\n"\n=0.1\n': ['\n'],
         });
     });
 
     it('matches multi-element headers', () => {
-        expectCapture(Parser._header, {
-            '"", -\n=\n': ['', null],
-            '-, -, -\n=\n': [null, null, null],
-            '"A", "B", "C"\n=\n': ['A', 'B', 'C'],
-            '"A", -, "Q", -\n=\n': ['A', null, 'Q', null],
+        expectCapture(Parser.header, {
+            '"", -\n= 0.1\n': ['', null],
+            '-, -, -\n= 0.1\n': [null, null, null],
+            '"A", "B", "C"\n= 0.1\n': ['A', 'B', 'C'],
+            '"A", -, "Q", -\n= 0.1\n': ['A', null, 'Q', null],
 
         });
+    });
+
+    it('rejects malformed headers', () => {
+        expectNoMatch(Parser.header, [
+            '= 0.1 \n', ' =0.1\n', '\n=0.1\n', '1\n=0.1\n',
+            '=\n', '= \n', '\n=\n', '\n= \n'
+        ]);
     });
 });
 
 
-describe('Row Data', () => {
+describe('Single Rows', () => {
     it('matches row separators', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '~\n': Parser.Token.Tilde,
         })
     });
     
     it('matches null elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '-\n': [null],
             '-\t\n': [null],
             '-    \n': [null],
@@ -49,7 +56,7 @@ describe('Row Data', () => {
     });
 
     it('matches numeric elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '1\n': [1],
             '4.7e5\t\n': [470000],
             '0xF5    \n': [0xF5],
@@ -59,7 +66,7 @@ describe('Row Data', () => {
     });
 
     it('matches string elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '"a"\n': ['a'],
             '"\\"foo\\""\t\n': ['"foo"'],
             '"0xF5"     \n': ["0xF5"],
@@ -69,7 +76,7 @@ describe('Row Data', () => {
     });
 
     it('matches boolean elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             'true\n': [true],
             'false\t\t\n': [false],
             'true    ,   false     \n': [true, false],
@@ -78,84 +85,76 @@ describe('Row Data', () => {
         });
     });
 
-})
-
-
-describe('Rejects malformed headers', () => {
-    it('rejects malformed headers', () => {
-        expectNoMatch(Parser._header, [
-            '= \n', ' =\n', '\n=\n', '1\n=\n',
-        ]);
+    it('matches heterogeneous elements', () => {
+        expectCapture(Parser.row, {
+            '1, "2", -, true\n': [1, '2', null, true],
+            '-, 0xCAFE, "don\'t panic", false\n': [null, 51966, "don't panic", false],
+        });
     });
 });
-// describe('Data Rows', () => {
-//     it('matches newlines', () => {
-//         expectCapture(Parser._newline, {
-//             '\n': Parser.Token.Newline,
-//         });
-//     });
-
-//     it('matches open brace', () => {
-//         expectCapture(Parser._openBrace, {
-//             '{': Parser.Token.OpenBrace,
-//             '{\t': Parser.Token.OpenBrace,
-//             '{    ': Parser.Token.OpenBrace,
-//         });
-//     });
-
-//     it('matches close brace', () => {
-//         // Note: the scanner pattern for close brace
-//         // expects a newline to immediately follow.
-//         expectCapture(Parser._closeBrace, {
-//             '}\n': Parser.Token.CloseBrace,
-//             '}\t\n': Parser.Token.CloseBrace,
-//             '}    \n': Parser.Token.CloseBrace,
-//         });
-//     });
-// });
 
 
-// describe('Format Rules', () => {
-//     it('matches single cells', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[A0]': 'A0',
-//             '[ZZZ999]': 'ZZZ999',
-//         });
-//     });
+describe('Row Data', () => {
 
-//     it('matches single columns', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[A]': 'A',
-//             '[ZZZ]': 'ZZZ',
-//         });
-//     });
+    it('matches a single row', () => {
+        expectCapture(Parser.data, {
+            '~\n': [[], []],
+            '-\n~\n-\n': [[[null]], [[null]]],
+        });
+    });
+    
+    it('matches multiple rows', () => {
+        expectCapture(Parser.data, {
+            '1\n2\n3\n4\n': [[[1], [2], [3], [4]]],
+            '1, 2, 3\n4, 5, 6\n7, 8, 9\n': [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+            '1, 2, 3\n-, -, -\n1, 2, 3\n': [[[1, 2, 3], [null, null, null], [1, 2, 3]]],
+        });
+    });
 
-//     it('matches single rows', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[0]': '0',
-//             '[999]': '999',
-//         });
-//     });
+    it('matches group separators', () => {
+        expectCapture(Parser.data, {
+            '"a", "b"\n1, 2\n~\n"c", "d"\n3, 4\n': [[['a', 'b'], [1, 2]], [['c', 'd'], [3, 4]]],
 
-//     it('matches column ranges', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[A:A]': 'A:A',
-//             '[A:ZZZ]': 'A:ZZZ',
-//             '[QRS:TUV]': 'QRS:TUV',
-//         });
-//     });
+        });
+    });
+});
 
-//     it('matches row ranges', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[0:0]': '0:0',
-//             '[1:42]': '1:42'
-//         });
-//     });
 
-//     it('matches rectangular selections', () => {
-//         expectCapture(Parser._cellRange, {
-//             '[A0:Z9]': 'A0:Z9',
-//             '[B2:D20]': 'B2:D20'
-//         });
-//     });
-// });
+describe('Format Rules', () => {
+    it('matches single cells', () => {
+        expectCapture(Parser.cellRange, {
+            'A0': 'A0',
+            'ZZZ999': 'ZZZ999',
+        });
+    });
+
+    it('matches column ranges', () => {
+        expectCapture(Parser.cellRange, {
+            'A:A': 'A:A',
+            'A:ZZZ': 'A:ZZZ',
+            'QRS:TUV': 'QRS:TUV',
+        });
+    });
+
+    it('matches row ranges', () => {
+        expectCapture(Parser.cellRange, {
+            '0:0': '0:0',
+            '1:42': '1:42'
+        });
+    });
+
+    it('matches rectangular selections', () => {
+        expectCapture(Parser.cellRange, {
+            'A0:Z9': 'A0:Z9',
+            'B2:D20': 'B2:D20'
+        });
+    });
+
+    it('rejects single columns', () => {
+        expectNoMatch(Parser.cellRange, ['A', 'ZZZ']);
+    });
+
+    it('rejects single rows', () => {
+        expectNoMatch(Parser.cellRange, ['0', '999']);
+    });
+});

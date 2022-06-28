@@ -7,6 +7,8 @@ class CellFormat {
         // to [A1:B2] format. Infinity is used as a default max value if none is
         // supplied in the rule.
         const rule = /^([A-Z]+)(?::([A-Z]+))?$|^([0-9]+)(?::([0-9]+))?$|^([A-Z]+)([0-9]+)(?::([A-Z]+)([0-9]+))?$/;
+        //const cell = /(?:([A-Z]+[\d]+):([A-Z]+[\d]+))|(?:([A-Z]+):([A-Z]+))|(?:([\d]+):([\d]+))|([A-Z]+[\d]+)[^\S\r\n]*/y;
+
         this.rules = {};
 
         for (let key in rules) {

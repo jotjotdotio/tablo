@@ -1,5 +1,5 @@
 "Event ID", "Event Type", "Start Date & Time", "End Date & Time", "Entered On", "Event Agency", "Parking Held", "Borough", "Community Board(s)", "Police Precinct(s)", "Category", "Subcategory Name", "Country", "Zip Code(s)"
-=
+= 0.1
 628327, "Shooting Permit", #2022-03-08T07:00:00, #2022-03-08T19:00:00, #2022-02-28T11:13:50, "Mayor's Office of Film, Theatre & Broadcasting", "SUTTON STREET between NORMAN AVENUE and NASSAU AVENUE", "Brooklyn", 1, 94, "Television", "Pilot", "United States of America", "11222"
 629351, "Shooting Permit", #2022-03-08T07:00:00, #2022-03-08T22:00:00, #2022-03-03T14:17:00, "Mayor's Office of Film, Theatre & Broadcasting", "COVERT ST between WYCKOFF AVENUE and IRVING AVENUE,  IRVING AVE between ELDERT ST and COVERT ST", "Queens", 5, 104, "Television", "Episodic series", "United States of America", "11237, 11385"
 629319, "Shooting Permit", #2022-03-08T07:00:00, #2022-03-08T21:00:00, #2022-03-03T13:15:00, "Mayor's Office of Film, Theatre & Broadcasting", "WHITE STREET between SEIGEL STREET and MOORE STREET,  SEIGEL STREET between WHITE STREET and BOGART STREET,  JOHNSON AVENUE between WHITE STREET and BOGART STREET,  JOHNSON AVENUE between BOGART STREET and MORGAN AVENUE,  BOGART STREET between JOHNSON AVENUE and DEAD END", "Brooklyn", 1, 90, "Television", "Cable-episodic", "United States of America", "11206"
