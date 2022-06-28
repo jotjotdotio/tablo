@@ -1,37 +1,37 @@
 import { expectCapture, expectNoMatch } from './utils/expect';
-import * as Parser from '../src/index';
+import * as Parser from '../src/parse';
 
 
 describe('Headers', () => {
     it('matches the empty header', () => {
-        expectCapture(Parser._header, {
-            '=\n': [],
+        expectCapture(Parser.header, {
+            '= 0.1\n': [],
         });
     });
 
     it('matches single element headers', () => {
-        expectCapture(Parser._header, {
-            '-\n=\n': [null],
-            '""\n=\n': [''],
-            '"A"\n=\n': ['A'],
-            '"Abc"\n=\n': ['Abc'],
-            '"\\n"\n=\n': ['\n'],
+        expectCapture(Parser.header, {
+            '-\n= 0.1\n': [null],
+            '""\n= 0.1\n': [''],
+            '"A"\n=0.1\n': ['A'],
+            '"Abc"\n=0.1\n': ['Abc'],
+            '"\\n"\n=0.1\n': ['\n'],
         });
     });
 
     it('matches multi-element headers', () => {
-        expectCapture(Parser._header, {
-            '"", -\n=\n': ['', null],
-            '-, -, -\n=\n': [null, null, null],
-            '"A", "B", "C"\n=\n': ['A', 'B', 'C'],
-            '"A", -, "Q", -\n=\n': ['A', null, 'Q', null],
+        expectCapture(Parser.header, {
+            '"", -\n= 0.1\n': ['', null],
+            '-, -, -\n= 0.1\n': [null, null, null],
+            '"A", "B", "C"\n= 0.1\n': ['A', 'B', 'C'],
+            '"A", -, "Q", -\n= 0.1\n': ['A', null, 'Q', null],
 
         });
     });
 
     it('rejects malformed headers', () => {
-        expectNoMatch(Parser._header, [
-            '= \n', ' =\n', '\n=\n', '1\n=\n',
+        expectNoMatch(Parser.header, [
+            '= 0.1 \n', ' =0.1\n', '\n=0.1\n', '1\n=\n',
         ]);
     });
 });
@@ -39,13 +39,13 @@ describe('Headers', () => {
 
 describe('Single Rows', () => {
     it('matches row separators', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '~\n': Parser.Token.Tilde,
         })
     });
     
     it('matches null elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '-\n': [null],
             '-\t\n': [null],
             '-    \n': [null],
@@ -55,7 +55,7 @@ describe('Single Rows', () => {
     });
 
     it('matches numeric elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '1\n': [1],
             '4.7e5\t\n': [470000],
             '0xF5    \n': [0xF5],
@@ -65,7 +65,7 @@ describe('Single Rows', () => {
     });
 
     it('matches string elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '"a"\n': ['a'],
             '"\\"foo\\""\t\n': ['"foo"'],
             '"0xF5"     \n': ["0xF5"],
@@ -75,7 +75,7 @@ describe('Single Rows', () => {
     });
 
     it('matches boolean elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             'true\n': [true],
             'false\t\t\n': [false],
             'true    ,   false     \n': [true, false],
@@ -85,7 +85,7 @@ describe('Single Rows', () => {
     });
 
     it('matches heterogeneous elements', () => {
-        expectCapture(Parser._row, {
+        expectCapture(Parser.row, {
             '1, "2", -, true\n': [1, '2', null, true],
             '-, 0xCAFE, "don\'t panic", false\n': [null, 51966, "don't panic", false],
         });
@@ -96,14 +96,14 @@ describe('Single Rows', () => {
 describe('Row Data', () => {
 
     it('matches a single row', () => {
-        expectCapture(Parser._data, {
+        expectCapture(Parser.data, {
             '~\n': [[], []],
             '-\n~\n-\n': [[[null]], [[null]]],
         });
     });
     
     it('matches multiple rows', () => {
-        expectCapture(Parser._data, {
+        expectCapture(Parser.data, {
             '1\n2\n3\n4\n': [[[1], [2], [3], [4]]],
             '1, 2, 3\n4, 5, 6\n7, 8, 9\n': [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
             '1, 2, 3\n-, -, -\n1, 2, 3\n': [[[1, 2, 3], [null, null, null], [1, 2, 3]]],
@@ -111,7 +111,7 @@ describe('Row Data', () => {
     });
 
     it('matches group separators', () => {
-        expectCapture(Parser._data, {
+        expectCapture(Parser.data, {
             '"a", "b"\n1, 2\n~\n"c", "d"\n3, 4\n': [[['a', 'b'], [1, 2]], [['c', 'd'], [3, 4]]],
 
         });

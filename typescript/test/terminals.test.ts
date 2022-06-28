@@ -1,11 +1,11 @@
 import { expectCapture, expectNoMatch } from './utils/expect';
-import * as Parser from '../src/index';
+import * as Parser from '../src/parse';
 
 
 describe('Values (happy cases)', () => {
 
     it('matches strings', () => {
-        expectCapture(Parser._string, {
+        expectCapture(Parser.stringValue, {
             '""': '',
             '"\\""': '\"',
             '"\'"': '\'',
@@ -25,7 +25,7 @@ describe('Values (happy cases)', () => {
     });
     
     it('matches integers', () => {
-        expectCapture(Parser._int, {
+        expectCapture(Parser.int, {
             '0': 0,
             '000': 0,
             '-1': -1,
@@ -39,7 +39,7 @@ describe('Values (happy cases)', () => {
     });
     
     it('matches floats', () => {
-        expectCapture(Parser._float, {
+        expectCapture(Parser.float, {
             '0.0': 0.0,
             '0.': 0.0,
             '000.': 0.0,
@@ -53,7 +53,7 @@ describe('Values (happy cases)', () => {
     });
     
     it('matches scientific notation', () => {
-        expectCapture(Parser._scientific, {
+        expectCapture(Parser.scientific, {
             '0e0': 0.0,
             '0e1': 0.0,
             '1e1': 10,
@@ -67,7 +67,7 @@ describe('Values (happy cases)', () => {
     });
 
     it('matches hexadecimal', () => {
-        expectCapture(Parser._hex, {
+        expectCapture(Parser.hex, {
             '0x0': 0,
             '0x1': 1,
             '0xF5': 0xF5,
@@ -78,7 +78,7 @@ describe('Values (happy cases)', () => {
     });
 
     it('matches booleans', () => {
-        expectCapture(Parser._boolean, {
+        expectCapture(Parser.booleanValue, {
             'true': true,
             'true\t': true,
             'true       ': true,
@@ -89,7 +89,7 @@ describe('Values (happy cases)', () => {
     });
 
     it('matches null', () => {
-        expectCapture(Parser._null, {
+        expectCapture(Parser.nullValue, {
             '-': null,
             '-\t': null,
             '-     ': null,
@@ -101,25 +101,25 @@ describe('Values (happy cases)', () => {
 describe('Tokens', () => {
 
     it('matches equals', () => {
-        expectCapture(Parser._equals, {
+        expectCapture(Parser.equals, {
             '=': Parser.Token.Equals,
         });
     });
 
     it('matches tilde', () => {
-        expectCapture(Parser._tilde, {
+        expectCapture(Parser.tilde, {
             '~': Parser.Token.Tilde,
         });
     });
 
     it('matches star', () => {
-        expectCapture(Parser._star, {
+        expectCapture(Parser.star, {
             '*': Parser.Token.Star,
         });
     });
 
     it('matches comma', () => {
-        expectCapture(Parser._comma, {
+        expectCapture(Parser.comma, {
             ',': Parser.Token.Comma,
             ',\t': Parser.Token.Comma,
             ',     ': Parser.Token.Comma,
@@ -127,13 +127,13 @@ describe('Tokens', () => {
     });
 
     it('matches newlines', () => {
-        expectCapture(Parser._newline, {
+        expectCapture(Parser.newline, {
             '\n': Parser.Token.Newline,
         });
     });
 
     it('matches open brace', () => {
-        expectCapture(Parser._openBrace, {
+        expectCapture(Parser.openBrace, {
             '{': Parser.Token.OpenBrace,
             '{\t': Parser.Token.OpenBrace,
             '{    ': Parser.Token.OpenBrace,
@@ -143,7 +143,7 @@ describe('Tokens', () => {
     it('matches close brace', () => {
         // Note: the scanner pattern for close brace
         // expects a newline to immediately follow.
-        expectCapture(Parser._closeBrace, {
+        expectCapture(Parser.closeBrace, {
             '}\n': Parser.Token.CloseBrace,
             '}\t\n': Parser.Token.CloseBrace,
             '}    \n': Parser.Token.CloseBrace,
@@ -200,7 +200,7 @@ describe('Ranges', () => {
 
 describe('Properties', () => {
     it('matches style property names', () => {
-        expectCapture(Parser._propName, {
+        expectCapture(Parser.tag, {
             'plain': 'plain',
             'bold': 'bold',
             'italic': 'italic',
@@ -210,14 +210,14 @@ describe('Properties', () => {
     });
 
     it('matches font property names', () => {
-        expectCapture(Parser._propName, {
+        expectCapture(Parser.tag, {
             'normal': 'normal',
             'mono': 'mono',
         });
     });
 
     it('matches color property names', () => {
-        expectCapture(Parser._propName, {
+        expectCapture(Parser.tag, {
             'black': 'black',
             'red': 'red',
             'orange': 'orange',
@@ -234,32 +234,32 @@ describe('Properties', () => {
 
 describe('Values (rejections)', () => {
     it('rejects non-strings', () => {
-        expectNoMatch(Parser._string, [
+        expectNoMatch(Parser.stringValue, [
             '"', '"\n"', '@"', '-', 
         ]);
     });
     
     
     it('rejects non-integers', () => {
-        expectNoMatch(Parser._int, [
+        expectNoMatch(Parser.int, [
             'a', '0__0', '3.', '.9', '#', '--', '+-', '+_0'
         ]);
     });
 
     it('rejects non-floats', () => {
-        expectNoMatch(Parser._float, [
+        expectNoMatch(Parser.float, [
             '34,5', 'abc', '12', '0__0.0', '0.0__0'
         ]);
     });
     
     it('rejects unscientific notation', () => {
-        expectNoMatch(Parser._scientific, [
+        expectNoMatch(Parser.scientific, [
             '0', '+-0', '0__0.0e0'
         ]);
     });
 
     it('rejects non-hexadecimal', () => {
-        expectNoMatch(Parser._hex, [
+        expectNoMatch(Parser.hex, [
             '0', '12', '12.3', '0xx0', 'CAFE', '0CAFE', '"0x00"'
         ]);
     })

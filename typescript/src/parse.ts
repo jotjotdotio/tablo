@@ -24,7 +24,7 @@ const pattern = {
     version: / ?(\d+\.\d+)/y,
     formatRngSel: /\[([A-Z]+(?::[A-Z]+)?|[\d]+(?::[\d]+)?|[A-Z]+[\d]+(?::[A-Z]+[\d]+)?)\][^\S\r\n]*/y,
     // Matches cell specifiers in the form A1:Z9, B:F, 0:9, or D4
-    cellRange: /\(?:([A-Z]+[\d]+):([A-Z]+[\d]+)|([A-Z]+):([A-Z]+)|([\d]+):([\d]+)|([A-Z]+[\d]+))\[^\S\r\n]*/y,
+    cellRange: /(?:([A-Z]+[\d]+):([A-Z]+[\d]+)|([A-Z]+):([A-Z]+)|([\d]+):([\d]+)|([A-Z]+[\d]+))[^\S\r\n]*/y,
     tag: /([A-Za-z][A-Za-z0-9_-]*)[^\S\r\n]*/y,
     propName: /(plain|bold|italic|underline|strike|normal|mono|black|red|orange|yellow|green|blue|violet|grey|white)[^\S\r\n]*/y,
 };
@@ -38,7 +38,7 @@ type data = row[];
 
 type format = { [key: string]: string[] };
 
-const Token = Object.freeze({
+export const Token = Object.freeze({
     Equals: Symbol(),
     Tilde: Symbol(),
     Star: Symbol(),
