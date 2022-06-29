@@ -1,10 +1,11 @@
 {
-  "name": "typescript",
-  "version": "0.1.0",
+  "name": "tablo-fyi",
+  "version": "0.3.0",
   "description": "A tabular data format that doesn't make you want to pull your hair out",
+  "homepage": "https://tablo.fyi",
   "main": "index.ts",
   "repository": "https://github.com/jotjotdotio/tablo",
-  "author": "Brendan Berg",
+  "author": "Brendan Berg (https://berg.industries)",
   "license": "MIT",
   "private": false,
   "dependencies": {
@@ -14,7 +15,11 @@
   "devDependencies": {
     "@types/jest": "^28.1.1",
     "@types/node": "^17.0.42",
+    "jasmine": "^4.2.1",
+    "jasmine-check": "^1.0.0-rc.0",
     "jest": "^28.1.1",
+    "jest-jasmine2": "^28.1.2",
+    "testcheck": "^1.0.0-rc.2",
     "ts-jest": "^28.0.4"
   }
 }
