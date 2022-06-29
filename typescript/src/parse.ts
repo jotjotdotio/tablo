@@ -2,11 +2,11 @@ import {concat, altern, repeat, ParseResult} from './combinators';
 
 const pattern = {
     // Value types
-    string: /"((?:[^"\n\\]|\\.)*)"[^\S\r\n]*/y,
+    string: /"((?:[^"\n\r\b\\]|\\.)*)"[^\S\r\n]*/y,
     integer: /([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
     float: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.\d+))[^\S\r\n]*/y,
     hex: /([+-]?0x(?:[\dA-Fa-f]+_?)*[\dA-Fa-f]+)[^\S\r\n]*/y,
-    exponent: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.0+|(?:\d+_?)*\d+))[eE]([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
+    exponent: /([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.\d+|(?:\d+_?)*\d+))[eE]([+-]?(?:\d+_?)*\d+)[^\S\r\n]*/y,
     date: /#(?:(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?)?/y,
     time: /(\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d{4}))?)?)?(Z|[+-]?\d{4})?/y,
     boolean: /(true|false)[^\S\r\n]*/y,
@@ -443,7 +443,7 @@ export const closeBrace = (input: string, offset: number): ParseResult => {
  * will be 'string'.
  */
 export const stringValue = (input: string, offset: number): ParseResult => {
-    const escapeSequence = /\\["nt\\]|\\u\{([0-9A-Fa-f]{1,8})\}/g;
+    const escapeSequence = /\\["ntfrb\\]|\\u\{([0-9A-Fa-f]{1,8})\}/g;
     
     pattern.string.lastIndex = offset;
     const match = pattern.string.exec(input);
@@ -456,6 +456,9 @@ export const stringValue = (input: string, offset: number): ParseResult => {
                 case '\\"': return '"';
                 case '\\n': return '\n';
                 case '\\t': return '\t';
+                case '\\f': return '\f';
+                case '\\r': return '\r';
+                case '\\b': return '\b';
                 case '\\\\': return '\\';
             }
         });
