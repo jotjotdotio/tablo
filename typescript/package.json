@@ -1,11 +1,11 @@
 {
   "name": "tablo-fyi",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A tabular data format that doesn't make you want to pull your hair out",
   "homepage": "https://tablo.fyi",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["./dist/**"],
+  "files": ["dist"],
   "repository": "https://github.com/jotjotdotio/tablo",
   "author": "Brendan Berg (https://berg.industries)",
   "license": "MIT",
