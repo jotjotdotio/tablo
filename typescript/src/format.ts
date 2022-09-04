@@ -1,4 +1,4 @@
-class CellFormat {
+export class CellFormat {
     private rules: {[key: string]: string[]};
 
     public constructor (rules: {[key: string]: string[]}) {

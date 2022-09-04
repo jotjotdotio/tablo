@@ -1,4 +1,5 @@
 import {concat, altern, repeat, ParseResult} from './combinators';
+import {CellFormat} from './format';
 
 const pattern = {
     // Value types

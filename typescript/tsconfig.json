@@ -1,6 +1,16 @@
 {
     "compilerOptions": {
+        "target": "es6",
         "types": ["jest", "node"],
         "esModuleInterop": true,
-    }
+        "module": "system",
+        "moduleResolution": "node",
+        "lib": ["es2017", "es7", "es6", "dom"],
+        "outFile": "./dist/index.js",
+        "outDir": "./dist",
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true
+    },
+    "include": ["./src/**.*"],
+    "exclude": ["./node_modules"]
 }

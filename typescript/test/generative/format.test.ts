@@ -17,6 +17,9 @@ describe('Format', () => {
     const genRowRange = gen.array([gen.posInt, gen.posInt]).then(a => a.join(':'));
     const genCellRange = gen.array([genCellAddr, genCellAddr]).then(a => a.join(':'));
 
+    const genColumnFormats = gen.array(gen.array([
+        genColumnRange, ' {normal}\n'
+    ]).then(a => a.join(''))).then(a => '*\n' + a.join(''));
 
     check.it('cell range: columns', genColumnRange, (columns) => {
         const [offset, result, error] = Parser.cellRange(columns, 0);
@@ -38,4 +41,11 @@ describe('Format', () => {
         expect(offset).toEqual(cells.length);
         expect(error).toBeUndefined();
     });
+
+    check.it('format object: columns', genColumnFormats, (format) => {
+        const [offset, result, error] = Parser.format(format, 0);
+        expect(error).toBeUndefined();
+        expect(offset).toEqual(format.length);
+        console.log(result);
+    })
 });
