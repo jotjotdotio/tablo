@@ -1,5 +1,6 @@
 import {concat, altern, repeat, ParseResult} from './combinators';
 import {CellFormat} from './format';
+import { Table } from './table';
 
 const pattern = {
     // Value types
@@ -57,26 +58,33 @@ export const Token = Object.freeze({
  * @returns a ParseResult vector
  */
  export const document = (input: string, offset: number): ParseResult => {
-    let [position, result, error] = concat(header, data)(input, offset);
+    let [position, head, error] = header(input, offset);
 
     if (error) {
         return [position, undefined, error];
     }
 
-    const [head, rows] = result;
+    let table;
+    [position, table, error] = data(input, position);
+
+    if (error) {
+        return [position, undefined, error];
+    }
+
+    table.header = head;
 
     if (position === input.length) {
-        return [position, [head, rows, new CellFormat({})], undefined];
+        return [position, table, undefined];
     }
 
-    let fmts;
-    [position, fmts, error] = format(input, position);
+    [position, table.format, error] = format(input, position);
 
     if (error) {
         return [position, undefined, error];
     }
 
-    return [position, [head, rows, fmts], undefined];
+    // table.format = fmts;
+    return [position, table, undefined];
 }
 
 /**
@@ -141,17 +149,20 @@ export const Token = Object.freeze({
     if (error) {
         return [position, undefined, error];
     } else {
-        const groups = rows.reduce((sections, elt) => {
+        let count = 0;
+        const breaks = [];
+        const table = new Table(null, rows.reduce((result, elt) => {
             if (elt === Token.Tilde) {
-                sections.push([]);
+                breaks.push(count);
             } else {
-                sections[sections.length - 1].push(elt);
+                count += 1;
+                result.push(elt);
             }
+            return result;
+        }, []));
 
-            return sections;
-        }, [[]]);
-
-        return [position, groups, undefined];
+        table.breaks = breaks;
+        return [position, table, undefined];
     }
 }
 

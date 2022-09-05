@@ -46,6 +46,6 @@ describe('Format', () => {
         const [offset, result, error] = Parser.format(format, 0);
         expect(error).toBeUndefined();
         expect(offset).toEqual(format.length);
-        console.log(result);
+        //console.log(result);
     })
 });

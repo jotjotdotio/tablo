@@ -1,8 +1,9 @@
 {
   "name": "tablo-fyi",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "description": "A tabular data format that doesn't make you want to pull your hair out",
   "homepage": "https://tablo.fyi",
+  "keywords": ["csv", "tsv", "table", "data", "parser", "parse", "format", "delimited", "text"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": ["dist"],

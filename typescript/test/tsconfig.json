@@ -6,10 +6,8 @@
         "module": "umd",
         "moduleResolution": "node",
         "lib": ["es2017", "es7", "es6", "dom"],
-        "outDir": "./dist",
         "forceConsistentCasingInFileNames": true,
         "declaration": true
     },
-    "include": ["./src/**.*"],
-    "exclude": ["./node_modules"]
+    "include": ["**/**.ts"],
 }

@@ -33,3 +33,38 @@ about the type of data in each cell. If a value is surrounded by quotes, it is
 *always* a string. If a value is a number without quotes, it is *always* a
 number. If a value is an ISO-8601 formatted date preceded by a hash mark, it
 is *always* a datetime.
+
+## Installation
+
+Install with `npm`:
+
+```
+npm install tablo-fyi
+```
+
+Or, if you use `yarn`:
+
+```
+yarn add tablo-fyi
+```
+
+## Usage
+
+Parsing is accomplished with the `parse` function.
+
+```
+const tablo = require('tablo-fyi');
+const head, data, format = tablo.parse('');
+```
+
+
+
+## More Information
+
+More information can be found in [the __tablo__ specification][spec], and a
+set of [example files][examples] can be found in the [project repository][repo].
+
+[taoup]: http://www.catb.org/esr/writings/taoup/html/ch05s02.html#id2901882
+[spec]: https://tablo.fyi
+[examples]: https://github.com/jotjotdotio/tablo/tree/main/examples
+[repo]: https://github.com/jotjotdotio/tablo

@@ -61,7 +61,7 @@ export class CellFormat {
     private alphaToInt (index: string) {
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return index.split('').reverse().reduce((sum, char, idx) => {
-            return sum + alphabet.indexOf(char) * (10 ^ idx);
+            return sum + alphabet.indexOf(char) * Math.pow(26, idx);
         }, 0);
     }
 }

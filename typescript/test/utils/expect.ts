@@ -37,3 +37,18 @@ export const expectNoMatch = (rule: ParseRule, inputs: string[]) => {
         }
     });
 }
+
+export const expectDocument = (rule: ParseRule, inputs: {[key: string]: any}) => {
+    Object.keys(inputs).forEach(key => {
+        const match = rule(key, 0);
+        expect(match).not.toBeNull();
+
+        const [offset, table, error] = match;
+        expect(error).toBeUndefined();
+        expect(offset).toBe(key.length);
+
+        //const [head, data, _rules] = result;
+        expect(table.header).toStrictEqual(inputs[key][0]);
+        expect(table.data).toStrictEqual(inputs[key][1]);
+    })
+}

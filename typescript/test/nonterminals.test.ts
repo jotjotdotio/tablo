@@ -1,5 +1,6 @@
 import { expectCapture, expectNoMatch } from './utils/expect';
 import * as Parser from '../src/parse';
+import { Table } from '../src/table';
 
 
 describe('Headers', () => {
@@ -97,24 +98,32 @@ describe('Single Rows', () => {
 describe('Row Data', () => {
 
     it('matches a single row', () => {
+        const emptyTable = new Table(null, []);
+        emptyTable.breaks = [0];
+
+        const nonEmptyTable = new Table(null, [[null], [null]]);
+        nonEmptyTable.breaks = [1];
+
         expectCapture(Parser.data, {
-            '~\n': [[], []],
-            '-\n~\n-\n': [[[null]], [[null]]],
+            '~\n': emptyTable,
+            '-\n~\n-\n': nonEmptyTable,
         });
     });
     
     it('matches multiple rows', () => {
         expectCapture(Parser.data, {
-            '1\n2\n3\n4\n': [[[1], [2], [3], [4]]],
-            '1, 2, 3\n4, 5, 6\n7, 8, 9\n': [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
-            '1, 2, 3\n-, -, -\n1, 2, 3\n': [[[1, 2, 3], [null, null, null], [1, 2, 3]]],
+            '1\n2\n3\n4\n': new Table(null, [[1], [2], [3], [4]]),
+            '1, 2, 3\n4, 5, 6\n7, 8, 9\n': new Table(null, [[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
+            '1, 2, 3\n-, -, -\n1, 2, 3\n': new Table(null, [[1, 2, 3], [null, null, null], [1, 2, 3]]),
         });
     });
 
     it('matches group separators', () => {
+        const table = new Table(null, [['a', 'b'], [1, 2], ['c', 'd'], [3, 4]]);
+        table.breaks = [2];
+        
         expectCapture(Parser.data, {
-            '"a", "b"\n1, 2\n~\n"c", "d"\n3, 4\n': [[['a', 'b'], [1, 2]], [['c', 'd'], [3, 4]]],
-
+            '"a", "b"\n1, 2\n~\n"c", "d"\n3, 4\n': table,
         });
     });
 });
