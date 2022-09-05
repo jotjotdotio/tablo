@@ -54,10 +54,11 @@ Parsing is accomplished with the `parse` function.
 
 ```
 const tablo = require('tablo-fyi');
-const head, data, format = tablo.parse('');
+const data = tablo.parse('"name", "age"\n=0.1\n"Tom", 24\n"Jerry", 27\n');
+
+const name = data.get('A', 0); // Retrieves the value in column A, row 0 => 'Tom'
+const age = data.get('B', 1);  // Retrieves the value in column B, row 1 => 27
 ```
-
-
 
 ## More Information
 
