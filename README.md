@@ -1,7 +1,7 @@
 # The Tablo File Format
 
 __tablo__ is a plain text interchange format for tabular data. It is more
-powerful than CSV while remaining easy for people to read and write.
+expressive than CSV while remaining easy for people to read and write.
 
 It adds explicit headers, datatypes, and cell formatting to address
 shortcomings of delimiter-separated formats like CSV or TSV. __tablo__ solves
