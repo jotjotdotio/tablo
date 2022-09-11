@@ -1,13 +1,13 @@
-export declare type label = string | null;
-export declare type element = string | number | boolean | null;
-export declare type row = element[];
+import { TableFormat } from "./format";
+import { label, row } from "./types";
 export declare class Table {
     header: label[];
-    rows: row[];
-    constructor(header: label[], rows: row[]);
+    data: row[];
+    format: TableFormat;
+    breaks: number[];
+    constructor(header: label[] | null, rows: row[], format?: TableFormat);
     concat(rows: row[]): void;
+    get(column: number | string, row: number): import("./types").element;
     getRow(row: number): row;
-    getCell(row: number, column: string): element;
-    unparse(): string;
     private alphaToInt;
 }

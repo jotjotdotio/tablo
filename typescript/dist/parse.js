@@ -4,7 +4,7 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "./combinators", "./format"], factory);
+        define(["require", "exports", "./combinators", "./format", "./table"], factory);
     }
 })(function (require, exports) {
     "use strict";
@@ -12,6 +12,7 @@
     exports.nullValue = exports.booleanValue = exports.hex = exports.int = exports.float = exports.scientific = exports.numberValue = exports.stringValue = exports.tag = exports.version = exports.closeBrace = exports.openBrace = exports.newline = exports.comma = exports.tilde = exports.star = exports.equals = exports.label = exports.element = exports.row = exports._properties = exports.cellRange = exports._formatRule = exports._formatRules = exports.format = exports.data = exports.header = exports.document = exports.Token = void 0;
     const combinators_1 = require("./combinators");
     const format_1 = require("./format");
+    const table_1 = require("./table");
     const pattern = {
         // Value types
         string: /"((?:[^"\n\r\b\\]|\\.)*)"[^\S\r\n]*/y,
@@ -54,20 +55,25 @@
      * @returns a ParseResult vector
      */
     const document = (input, offset) => {
-        let [position, result, error] = (0, combinators_1.concat)(exports.header, exports.data)(input, offset);
+        let [position, head, error] = (0, exports.header)(input, offset);
         if (error) {
             return [position, undefined, error];
         }
-        const [head, rows] = result;
+        let table;
+        [position, table, error] = (0, exports.data)(input, position);
+        if (error) {
+            return [position, undefined, error];
+        }
+        table.header = head;
         if (position === input.length) {
-            return [position, [head, rows, new format_1.CellFormat({})], undefined];
+            return [position, table, undefined];
         }
-        let fmts;
-        [position, fmts, error] = (0, exports.format)(input, position);
+        [position, table.format, error] = (0, exports.format)(input, position);
         if (error) {
             return [position, undefined, error];
         }
-        return [position, [head, rows, fmts], undefined];
+        // table.format = fmts;
+        return [position, table, undefined];
     };
     exports.document = document;
     /**
@@ -130,16 +136,20 @@
             return [position, undefined, error];
         }
         else {
-            const groups = rows.reduce((sections, elt) => {
+            let count = 0;
+            const breaks = [];
+            const table = new table_1.Table(null, rows.reduce((result, elt) => {
                 if (elt === exports.Token.Tilde) {
-                    sections.push([]);
+                    breaks.push(count);
                 }
                 else {
-                    sections[sections.length - 1].push(elt);
+                    count += 1;
+                    result.push(elt);
                 }
-                return sections;
-            }, [[]]);
-            return [position, groups, undefined];
+                return result;
+            }, []));
+            table.breaks = breaks;
+            return [position, table, undefined];
         }
     };
     exports.data = data;
@@ -160,10 +170,18 @@
             return [position, undefined, 'format rule'];
         }
         const rules = lines.reduce((result, line) => {
-            Object.assign(result, line);
-            return result;
+            //Object.assign(result, line);
+            return Object.entries(line).reduce((result, [key, props]) => {
+                if (result.hasOwnProperty(key)) {
+                    result[key] = result[key].concat(props);
+                }
+                else {
+                    result[key] = props;
+                }
+                return result;
+            }, result);
         }, {});
-        return [position, new format_1.CellFormat(rules), undefined];
+        return [position, new format_1.TableFormat(rules), undefined];
     };
     exports._formatRules = _formatRules;
     const _formatRule = (input, offset) => {
@@ -172,7 +190,7 @@
             return [position, undefined, error];
         }
         else {
-            const [range, props] = result;
+            const [range, ...props] = result;
             return [position, { [range]: props }, undefined];
         }
     };

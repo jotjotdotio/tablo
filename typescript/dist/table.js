@@ -11,27 +11,26 @@
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Table = void 0;
     class Table {
-        constructor(header, rows) {
+        constructor(header, rows, format) {
             this.header = header;
-            this.rows = rows;
+            this.data = rows;
+            this.format = format;
+            this.breaks = [];
         }
         concat(rows) {
-            this.rows.push(...rows);
+            this.data.push(...rows);
+        }
+        get(column, row) {
+            const columnNum = typeof column === 'number' ? column : this.alphaToInt(column);
+            return this.data[row][columnNum];
         }
         getRow(row) {
-            return this.rows[row];
-        }
-        getCell(row, column) {
-            const columnNum = this.alphaToInt(column);
-            return this.rows[row][columnNum];
-        }
-        unparse() {
-            return this.header.toString() + '=\n' + this.rows.toString();
+            return this.data[row];
         }
         alphaToInt(index) {
             const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             return index.split('').reverse().reduce((sum, char, idx) => {
-                return sum + alphabet.indexOf(char) * (10 ^ idx);
+                return sum + alphabet.indexOf(char) * Math.pow(26, idx);
             }, 0);
         }
     }

@@ -1,5 +1,5 @@
 import {concat, altern, repeat, ParseResult} from './combinators';
-import {CellFormat} from './format';
+import {TableFormat} from './format';
 import { Table } from './table';
 
 const pattern = {
@@ -187,11 +187,18 @@ export const _formatRules = (input: string, offset: number): ParseResult => {
     }
 
     const rules = lines.reduce((result: RuleType, line: RuleType) => {
-        Object.assign(result, line);
-        return result;
+        //Object.assign(result, line);
+        return Object.entries(line).reduce((result, [key, props]) => {
+            if (result.hasOwnProperty(key)) {
+                result[key] = result[key].concat(props);
+            } else {
+                result[key] = props;
+            }
+            return result;
+        }, result);
     }, {});
 
-    return [position, new CellFormat(rules), undefined];
+    return [position, new TableFormat(rules), undefined];
 }
 
 export const _formatRule = (input: string, offset: number): ParseResult => {
@@ -200,7 +207,7 @@ export const _formatRule = (input: string, offset: number): ParseResult => {
     if (error) {
         return [position, undefined, error];
     } else {
-        const [range, props] = result;
+        const [range, ...props] = result;
         return [position, { [range]: props }, undefined];
     }
 }

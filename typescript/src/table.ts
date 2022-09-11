@@ -1,14 +1,13 @@
-export type label = string | null;
-export type element = string | number | boolean | null;
-export type row = element[];
+import { TableFormat } from "./format";
+import { label, row } from "./types";
 
 export class Table {
     public header: label[];
     public data: row[];
-    public format: any;
+    public format: TableFormat;
     public breaks: number[];
 
-    public constructor(header: label[] | null, rows: row[], format?: object) {
+    public constructor(header: label[] | null, rows: row[], format?: TableFormat) {
         this.header = header;
         this.data = rows;
         this.format = format;
@@ -26,28 +25,6 @@ export class Table {
 
     public getRow(row: number) {
         return this.data[row];
-    }
-
-    public unparse() {
-        let header = '';
-        if (this.header !== null || this.header.length) {
-            header = this.header.map(val => `"${val}"`).join(',') + '\n';
-        }
-        let data = '';
-        data = this.data.map(row => row.map(elt => {
-            switch (typeof elt) {
-            case 'string': return `"${elt}"`
-            case 'number': return elt.toString(10);
-            case 'boolean': return elt ? 'true' : 'false';
-            case 'object':
-                if (elt === null) {
-                    return '-';
-                } // else if (elt instanceof Date) {
-                //     return elt.toISOString();
-                // }
-            }
-        }).join(',')).join('\n');
-        return header + '=\n' + data;
     }
 
     private alphaToInt (index: string) {

@@ -27,13 +27,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "./parse"], factory);
+        define(["require", "exports", "./parse", "./serializers"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.unparse = exports.parse = void 0;
+    exports.setSerializer = exports.serialize = exports.parse = void 0;
     const Parse = __importStar(require("./parse"));
+    const serializers_1 = require("./serializers");
+    let defaultSerializer = new serializers_1.TabloSerializer();
     const parse = (input) => {
         const [_ignore, data, error] = Parse.document(input, 0);
         if (error) {
@@ -44,16 +46,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
         }
     };
     exports.parse = parse;
-    const unparse = (header, data) => {
-        const hh = doHeader(header);
-        const dd = doData(data);
-        return `${hh}\n=\n${dd}\n`;
+    const serialize = (table) => {
+        return defaultSerializer.serialize(table);
     };
-    exports.unparse = unparse;
-    const doHeader = (header) => {
-        return '';
+    exports.serialize = serialize;
+    const setSerializer = (serializer) => {
+        defaultSerializer = new serializer();
     };
-    const doData = (data) => {
-        return "";
-    };
+    exports.setSerializer = setSerializer;
 });

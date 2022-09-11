@@ -1,3 +1,5 @@
-import { label, row } from './table';
+import { SerializationStrategy } from './serializers';
+import { Table } from './table';
 export declare const parse: (input: string) => any;
-export declare const unparse: (header: label[], data: row[]) => string;
+export declare const serialize: (table: Table) => string;
+export declare const setSerializer: (serializer: new () => SerializationStrategy) => void;

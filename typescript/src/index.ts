@@ -1,5 +1,9 @@
 import * as Parse from './parse';
-import {label, row} from './table';
+import { SerializationStrategy, TabloSerializer } from './serializers';
+import { Table } from './table';
+
+
+let defaultSerializer: SerializationStrategy = new TabloSerializer();
 
 export const parse = (input: string) => {
     const [_ignore, data, error] = Parse.document(input, 0);
@@ -11,17 +15,10 @@ export const parse = (input: string) => {
     }
 };
 
-export const unparse = (header: label[], data: row[]) => {
-    const hh = doHeader(header);
-    const dd = doData(data);
-
-    return `${hh}\n=\n${dd}\n`;
+export const serialize = (table: Table) => {
+    return defaultSerializer.serialize(table);
 };
 
-const doHeader = (header: label[]) => {
-    return '';
-}
-
-const doData = (data: row[]) => {
-    return "";
+export const setSerializer = (serializer: new () => SerializationStrategy) => {
+    defaultSerializer = new serializer();
 }
