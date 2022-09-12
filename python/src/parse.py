@@ -1,33 +1,35 @@
+from functools import reduce
 import re
 from enum import Enum
 
 from combinators import concat, altern, repeat
 from format import TableFormat
+from table import Table
 
 
 pattern = {
     'string': re.compile(r'"((?:[^"\n\r\b\\]|\\.)*)"[^\S\r\n]*'),
     'integer': re.compile(r'([+-]?(?:\d+_?)*\d+)[^\S\r\n]*'),
-    'float': None,
-    'hex': None,
-    'exponent': None,
-    'date': None,
-    'time': None,
-    'boolean': None,
-    'null': None,
+    'float': re.compile(r'([+-]?(?:(?:(?:0|[1-9](?:_?\d+)*)\.(?:(?:\d+_?)*\d+)?)|0\.|\.\d+))[^\S\r\n]*'),
+    'hex': re.compile(r'([+-]?0x(?:[\dA-Fa-f]+_?)*[\dA-Fa-f]+)[^\S\r\n]*'),
+    'exponent': re.compile(r'([+-]?(?:(?:0|[1-9](?:_?\d+)*\.(?:(?:\d+_?)*\d+)?)|0\.|\.\d+|(?:\d+_?)*\d+))[eE]([+-]?(?:\d+_?)*\d+)[^\S\r\n]*'),
+    'date': re.compile(r'#(?:(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?)?'),
+    'time': re.compile(r'(\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d{4}))?)?)?(Z|[+-]?\d{4})?'),
+    'boolean': re.compile(r'(true|false)[^\S\r\n]*'),
+    'null': re.compile(r'-[^\S\r\n]*'),
 
     'newline': re.compile(r'\n'),
-    'comma': None,
-    'equals': None,
-    'tilde': None,
-    'star': None,
-    'openBrace': None,
-    'closeBrace': None,
+    'comma': re.compile(r',[^\S\r\n]*'),
+    'equals': re.compile(r'='),
+    'tilde': re.compile(r'~'),
+    'star': re.compile(r'\*'),
+    'openBrace': re.compile(r'{[^\S\r\n]*'),
+    'closeBrace': re.compile(r'}[^\S\r\n]*\n'),
 
-    'version': None,
-    'cellRange': None,
-    'tag': None,
-    'propName': None,
+    'version': re.compile(r' ?(\d+\.\d+)'),
+    'cellRange': re.compile(r''),
+    'tag': re.compile(r'([A-Za-z_][A-Za-z0-9_-]*)[^\S\r\n]*'),
+    'propName': re.compile(r'(plain|bold|italic|underline|strike|normal|mono|black|red|orange|yellow|green|blue|violet|grey|white)[^\S\r\n]*'),
 }
 
 class Token(Enum):
@@ -93,15 +95,25 @@ def header(input: str, offset: int):
         return (offset, elts, None)
 
 def data(input: str, offset: int):
-    # TODO: FINISH THIS IMPLEMENTATION
     offset, rows, error = repeat(row)(input, offset)
 
-    if error: return (offset, None, error)
+    if error:
+        return (offset, None, error)
     else:
-        count = 0
-        breaks = []
-        table = {}
+        def process(result, elt):
+            count, rows, breaks = result
+            
+            if elt == Token.Tilde:
+                breaks.append(count)
+            else:
+                count += 1
+                result.append(elt)
 
+            return (count, rows, breaks)
+
+        _count, result, breaks = reduce(process, rows, (0, [], []))
+
+        table = Table(None, result, [])
         table.breaks = breaks
         return (offset, table, None)
 

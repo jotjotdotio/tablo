@@ -1,7 +1,8 @@
-
 import parse
+from serializers import Serializer, TabloSerializer
 
-defaultSerializer = object()
+
+defaultSerializer: Serializer = TabloSerializer
 
 def parse(input: str):
     _ignore, data, error = parse.document(input, 0)
@@ -14,5 +15,6 @@ def parse(input: str):
 def serialize(table):
     return defaultSerializer.serialize(table)
 
-def setSerializer(serializer):
-    defaultSerializer = serializer()
+def setSerializer(serializer: Serializer):
+    global defaultSerializer
+    defaultSerializer = serializer
