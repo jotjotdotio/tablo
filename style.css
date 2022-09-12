@@ -17,6 +17,13 @@ code {
     font-family: 'Roboto Mono', monospace;
 }
 
+pre {
+    font-family: 'Roboto Mono', monospace;
+    line-height: 1.4em;
+    font-size: 0.85em;
+    font-weight: 300;
+}
+
 div.header {
     background-color: #FAFAFA;
     -webkit-box-shadow: 10pt 10pt 40pt 0pt rgba(179, 179, 179, 1);
@@ -154,5 +161,15 @@ section a:visited {
 
 section a {
     color: #3E5B98;
+}
+
+section pre {
+    padding: 10pt;
+    padding-top: 12pt;
+    border-radius: 8pt;
+    background-color: #f5f5f5;
+    -webkit-box-shadow: 5pt 5pt 20pt 0pt rgba(200, 200, 200, 1);
+    -moz-box-shadow: 5pt 5pt 20pt 0pt rgba(200, 200, 200, 1);
+    box-shadow: 5pt 5pt 20pt 0pt rgba(200, 200, 200, 1);
 }
 
