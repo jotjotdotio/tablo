@@ -15,8 +15,9 @@
         <div class="header">
             <img style="width: 100pt;" src="tablo.svg"/>
             <ul>
-                <li class="red"><a href="#about">About.</a></li>
-                <li class="orange"><a href="#implementations">Implementations.</a></li>
+                <li class="violet"><a href="#about">About.</a></li>
+                <li class="red"><a href="#implementations">Implementations.</a></li>
+                <li class="orange"><a href="#examples">Examples.</a></li>
                 <li class="yellow"><a href="#specification">Specification.</a></li>
             </ul>
         </div>
@@ -46,8 +47,8 @@
             <h1 class="red">Implementations.</h1>
             <p>There are officially supported <strong>tablo</strong>
                 implementations in Python and TypeScript/JavaScript. We welcome
-                community-driven implementations in other languages as well.
-                In the interest of clarity, the <strong>tablo</strong> maintainers
+                community-driven implementations in other languages as well.</p>
+            <p>In the interest of clarity, the <strong>tablo</strong> maintainers
                 ask that the <strong>tablo</strong> name be used only with
                 implementations that fully adhere to the specification described
                 here.</p>
@@ -58,8 +59,32 @@
             </ul>
         </section>
 
+        <section id="examples">
+            <h1 class="orange">Examples.</h1>
+            <p>The following example shows a <strong>tablo</strong> document with headers, data of
+                string, date, and numeric types, and a format section that declares the first column
+                should be rendered in bold, and the 3rd row should be rendered in red italic text.</p>
+            <p>Whitespace is optional between items in a row, and may be adjusted to improve legibility.</p>
+            <pre>
+"Title"               , "Medium"                               , "Year" , "Width" , "Height"
+= 0.1
+"Gold Marilyn Monroe" , "Silkscreen ink and acrylic on canvas" , #1962  , 211.4   , 144.7
+"Double Elvis"        , "Silkscreen ink on acrylic on canvas"  , #1963  , 210.8   , 134.6
+"Flowers"             , "Offset lithograph"                    , #1964  , 55.8    , 55.7
+"Cow"                 , "Screenprint"                          , #1966  , 116.7   , 74.5
+"Self-Portrait"       , "Screenprint"                          , #1966  , 56      , 52.8
+"Mao"                 , "Silkscreen ink and acrylic on linen"  , #1973  , 66.5    , 55.9
+*
+A:A {bold}
+3:3 {italic, red}
+            </pre>
+            <p>Additional examples can be found in the 
+                <a href="https://github.com/jotjotdotio/tablo/tree/main/examples"><strong>tablo</strong> repository on Github</a>.
+            </p>
+        </section>
+        
         <section id="specification">
-            <h1 class="orange">Specification.</h1>
+            <h1 class="yellow">Specification.</h1>
             <p>A <strong>tablo</strong> file is consists of three sections: an optional header, the
                 table data, and an optional format section. The header is a single line that
                 specifies column labels. Table data consists of individual lines of comma-separated
