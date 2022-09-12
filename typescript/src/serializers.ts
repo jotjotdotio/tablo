@@ -37,7 +37,7 @@ export class TabloSerializer implements SerializationStrategy {
             return '';
         }
 
-        return table.header.map(val => `"${val}"`).join(',') + '\n';
+        return table.header.map(val => this.serializeItem(val)).join(',') + '\n';
     }
 
     private serializeData(table: Table) {
