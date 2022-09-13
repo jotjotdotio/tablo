@@ -4,12 +4,12 @@ import re
 class TableFormat(object):
     rules = None
 
-    def __init__(self, rules):
+    def __init__(self, rules={}):
         rule = re.compile(r'^([A-Z]+)(?::([A-Z]+))?$|^([0-9]+)(?::([0-9]+))?$|^([A-Z]+)([0-9]+)(?::([A-Z]+)([0-9]+))?$')
         
         self.rules = []
 
-        for key, props in rules:
+        for key, props in rules.items():
             if match := rule.match(key):
                 start_row, end_row, start_col, end_col = (0, -1, 0, -1)
 
@@ -75,7 +75,7 @@ class TableFormat(object):
         alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         value = 0
 
-        for idx, char in enumerate(reversed(index.split(''))):
+        for idx, char in enumerate(reversed(index)):
             value += alphabet.index(char) * 26 ** idx
 
         return value

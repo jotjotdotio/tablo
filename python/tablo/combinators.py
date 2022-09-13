@@ -7,14 +7,14 @@ def concat(*rules):
         results = []
 
         for rule in rules:
-            offset, match, error = rule(input, cursor)
+            newOffset, match, error = rule(input, cursor)
 
             if error:
-                return (cursor, None, error)
+                return (offset, None, error)
             else:
-                cursor = offset
+                cursor = newOffset
 
-                if isinstance(match, Iterable):
+                if isinstance(match, Iterable) and not isinstance(match, str):
                     results.extend(match)
                 else:
                     results.append(match)
@@ -50,8 +50,9 @@ def repeat(*rules):
         while True:
             first, *rest = rules
             cursor, result, error = first(input, cursor)
-
+            
             if error:
+                error = None
                 break
             else:
                 results.append(result)

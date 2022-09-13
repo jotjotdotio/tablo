@@ -1,6 +1,6 @@
 import re
 from typing import Any
-from format import TableFormat
+from tablo.format import TableFormat
 
 
 class Table(object):
@@ -22,7 +22,7 @@ class Table(object):
     def get_row(self, row):
         return self.data[row]
 
-    def __getattribute__(self, name: str) -> Any:
+    def __getitem__(self, name: str) -> Any:
         if match := re.match(r'([A-Z]+)?([0-9]+)?', name):
             col, row = (None, None)
 
@@ -33,11 +33,20 @@ class Table(object):
                 row = int(row_str)
 
             if row is not None and col is not None:
-                return self.data[row][col]
+                try:
+                    return self.data[row][col]
+                except IndexError:
+                    raise KeyError()
             elif row is not None:
-                return self.data[row]
+                try:
+                    return self.data[row]
+                except IndexError:
+                    raise KeyError()
             elif col is not None:
-                return (row[col] for row in self.data)
+                try:
+                    return (row[col] for row in self.data)
+                except IndexError:
+                    raise KeyError()
             else:
                 raise KeyError()
         else:
@@ -47,7 +56,7 @@ class Table(object):
         alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         value = 0
 
-        for idx, char in enumerate(reversed(index.split(''))):
+        for idx, char in enumerate(reversed(index)):
             value += alphabet.index(char) * 26 ** idx
 
         return value

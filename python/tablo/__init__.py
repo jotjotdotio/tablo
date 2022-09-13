@@ -1,14 +1,14 @@
-import parse
-from serializers import Serializer, TabloSerializer
+from tablo.parse import document
+from tablo.serializers import Serializer, TabloSerializer
 
 
 defaultSerializer: Serializer = TabloSerializer
 
 def parse(input: str):
-    _ignore, data, error = parse.document(input, 0)
+    _ignore, data, error = document(input, 0)
 
     if error:
-        raise error
+        raise ValueError(error)
     else:
         return data
 

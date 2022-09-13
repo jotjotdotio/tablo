@@ -2,9 +2,9 @@ from functools import reduce
 import re
 from enum import Enum
 
-from combinators import concat, altern, repeat
-from format import TableFormat
-from table import Table
+from tablo.combinators import concat, altern, repeat
+from tablo.format import TableFormat
+from tablo.table import Table
 
 
 pattern = {
@@ -27,7 +27,7 @@ pattern = {
     'closeBrace': re.compile(r'}[^\S\r\n]*\n'),
 
     'version': re.compile(r' ?(\d+\.\d+)'),
-    'cellRange': re.compile(r''),
+    'cellRange': re.compile(r'((?:[A-Z]+[\d]+:[A-Z]+[\d]+)|(?:[A-Z]+:[A-Z]+)|(?:[\d]+:[\d]+)|(?:[A-Z]+[\d]+))[^\S\r\n]'),
     'tag': re.compile(r'([A-Za-z_][A-Za-z0-9_-]*)[^\S\r\n]*'),
     'propName': re.compile(r'(plain|bold|italic|underline|strike|normal|mono|black|red|orange|yellow|green|blue|violet|grey|white)[^\S\r\n]*'),
 }
@@ -107,13 +107,13 @@ def data(input: str, offset: int):
                 breaks.append(count)
             else:
                 count += 1
-                result.append(elt)
+                rows.append(elt)
 
             return (count, rows, breaks)
 
         _count, result, breaks = reduce(process, rows, (0, [], []))
 
-        table = Table(None, result, [])
+        table = Table(None, result, TableFormat())
         table.breaks = breaks
         return (offset, table, None)
 
@@ -149,7 +149,7 @@ def formatRule(input: str, offset: int):
     if error:
         return (offset, None, error)
     else:
-        return (offset, {result[0]: result[1:]}, None)
+        return (offset, (result[0], result[1:]), None)
 
 def cellRange(input: str, offset: int):
     if match := pattern['cellRange'].match(input, offset):
@@ -182,7 +182,7 @@ def row(input: str, offset: int):
         return (position, Token.Tilde, None)
     else:
         filtered = filter(lambda elt: elt not in (Token.Comma, Token.Newline), rowData)
-        return (position, filtered, None)
+        return (position, list(filtered), None)
 
 def element(input: str, offset: int):
     return altern(stringValue, number, booleanValue, nullValue)(input, offset)

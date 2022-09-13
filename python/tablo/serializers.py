@@ -1,4 +1,5 @@
-from table import Table
+from tablo.format import TableFormat
+from tablo.table import Table
 
 
 column_labels = {}
@@ -45,7 +46,7 @@ class TabloSerializer(Serializer):
         return ','.join(cls.serialize_item(val) for val in table.header) + '\n'
 
     @classmethod
-    def serlialize_data(cls, table: Table):
+    def serialize_data(cls, table: Table):
         return '\n'.join(','.join(
             cls.serialize_item(elt) for elt in row
         ) for row in table.data)
@@ -60,6 +61,13 @@ class TabloSerializer(Serializer):
             return 'true' if item else 'false'
         elif item is None:
             return '-'
+    
+    @classmethod
+    def serialize_format(cls, format: TableFormat):
+        rules = format.get_rules()
+        return '*\n' + '\n'.join(
+            f'{key} {{{",".join(props)}}}' for key, props in rules.items()
+        )
 
 
 class HtmlSerializer(Serializer):
@@ -82,7 +90,8 @@ class HtmlSerializer(Serializer):
 
         items = (serialize_item(index, item) for index, item in enumerate(table.header))
 
-        return f'\n  <thead><tr>\n    {"\n    ".join(items)}\n  </tr></thead>'
+        sep = "\n    "
+        return f'\n  <thead><tr>\n    {sep.join(items)}\n  </tr></thead>'
 
     @classmethod
     def serialize_data(cls, table: Table):
@@ -99,11 +108,13 @@ class HtmlSerializer(Serializer):
 
         def serialize_row(row_idx, row):
             items = (serialize_item(col_idx, row_idx, item) for col_idx, item in enumerate(row))
-            return f'<tr data-row-index="{row_idx}">\n      {"\n      ".join(items)}\n    </tr>'
+            sep = "\n      "
+            return f'<tr data-row-index="{row_idx}">\n      {sep.join(items)}\n    </tr>'
         
         rows = (serialize_row(index, row) for index, row in enumerate(table.data))
 
-        return f'\n  <tbody>\n    {"\n    ".join(rows)}\n  </tbody>'
+        sep = "\n    "
+        return f'\n  <tbody>\n    {sep.join(rows)}\n  </tbody>'
 
     @classmethod
     def serialize_item(cls, item):
