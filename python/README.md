@@ -47,9 +47,9 @@ python -m pip install tablo-fyi
 Parsing is accomplished with the `parse` function.
 
 ```
-from tablo import parse, serialize
+import tablo
 
-data = parse('"name", "age"\n=0.1\n"Tom", 24\n"Jerry", 27\n')
+data = tablo.parse('"name", "age"\n=0.1\n"Tom", 24\n"Jerry", 27\n')
 
 name = data['A0']  # Retrieves the value in column A, row 0 => 'Tom'
 age = data['B1']   # Retrieves the value in column B, row 1 => 27
