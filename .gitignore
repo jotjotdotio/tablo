@@ -1,2 +1,12 @@
 .DS_Store
+
+# Python
+__pycache__
+python/build
+python/dist
+*.egg-info
+*.pyc
+*.pyo
+
+# TypeScript
 node_modules
