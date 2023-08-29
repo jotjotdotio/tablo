@@ -6,7 +6,7 @@
 	.st0{fill:none;}
 	.st1{fill:none;stroke:#231F20;stroke-miterlimit:10;}
 	.st2{fill:#231F20;}
-	.st3{font-family:'SpaceMono-Regular';}
+	.st3{font-family:Courier;font-weight:400;}
 	.st4{font-size:10px;}
 </style>
 <font horiz-adv-x="1000">
